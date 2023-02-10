@@ -7,7 +7,7 @@ RUN set -eux; \
 	apt -y install --no-install-recommends \
 		backup-manager \
 		bzip2 dar gettext-base gpg lzma openssh-client rsync xzip zip \
-		anacron cron logrotate rsyslog; \
+		cron logrotate rsyslog; \
 	apt clean; rm -rf /var/lib/apt/lists/* /var/log/*.log
 
 # Setup
