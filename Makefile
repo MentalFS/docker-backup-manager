@@ -1,12 +1,15 @@
 NAME = mentalfs/backup-manager
 VERSION = latest
 
-.PHONY: build build-pull pull
+.PHONY: release release-pull pull test
 
-build:
+release:
 	docker build -t $(NAME):$(VERSION) .
 
-build-pull:
+release-pull:
 	docker build --pull -t $(NAME):$(VERSION) .
 
-pull: build-pull
+pull: release-pull
+
+test:
+	docker build --target=test .
