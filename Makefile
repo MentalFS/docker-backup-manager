@@ -4,4 +4,4 @@ VERSION = SNAPSHOT
 .PHONY: build
 
 build:
-	docker build -t $(NAME):$(VERSION) .
+	docker build --pull -t $(NAME):$(VERSION) .
