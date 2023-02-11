@@ -1,4 +1,4 @@
-FROM debian:stable-slim
+FROM debian:stable-slim as build
 
 # Packages
 RUN set -eux; \
@@ -48,6 +48,7 @@ ENV BM_UPLOAD_FTP_PURGE="false"
 ENV BM_UPLOAD_FTP_TTL=""
 ENV BM_UPLOAD_FTP_DESTINATION=""
 ENV TZ=Europe/Berlin
+ENV LANG=C.UTF-8
 
 # Setup
 RUN set -eux; \
@@ -61,7 +62,9 @@ COPY profile.d-timezone.sh /etc/profile.d/01-timezone.sh
 COPY profile.d-configuration.sh /etc/profile.d/02-configuration.sh
 COPY profile.d-services.sh /etc/profile.d/99-services.sh
 
+
 # Tests
+FROM build as test
 RUN set -eux; \
 	test -x /usr/sbin/backup-manager; \
 	test -x /etc/profile.d/01-timezone.sh; \
@@ -75,12 +78,9 @@ RUN set -eux; \
 	grep @reboot /etc/cron.d/backup-manager; \
 	bash /etc/backup-manager.env; \
 	bash /etc/backup-manager.conf; \
-	test -f /var/archives/DOCKER-root.*.master.tar.gz; \
-	rm -rf /var/log/* /var/archives \
-		/etc/backup-manager.env /etc/cron.d/backup-manager; \
-	touch /var/log/syslog /var/log/user.log
+	test -f /var/archives/DOCKER-root.*.master.tar.gz
 
-# Runtime
+# Release
+FROM build as release
 VOLUME /var/archives
-ENV LANG=C.UTF-8
-CMD	bash -lc "tail --follow=name -n +1 /var/log/syslog"
+CMD bash -lc "tail --follow=name -n +1 /var/log/syslog"
