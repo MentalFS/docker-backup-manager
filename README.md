@@ -14,6 +14,23 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 | `/root/.gnupg`  | Optional, GPG configuration folder for encryption              |
 
 
+## Download
+
+```
+docker pull ghcr.io/mentalfs/backup-manager
+```
+
+## Example
+
+```bash
+docker run --name backup-manager \
+  -v /path/to/my/archives:/var/archives \
+  -v my-first-volume:/VOLUME/my-first-volume \
+  -v my-second-volume:/VOLUME/my-second-volume \
+  -d ghcr.io/mentalfs/backup-manager
+```
+
+
 ## Supported settings
 
 | Environment Variable              | Default               |                                                                                             |
