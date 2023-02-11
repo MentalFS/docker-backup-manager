@@ -1,5 +1,5 @@
 # docker-backup-manager
-A Docker image for [Backup-Manager](https://github.com/sukria/Backup-Manager)
+A Docker image for [Backup-Manager](https://packages.debian.org/stable/backup-manager)
 
 This image is supposed to backup Docker volumes from other containers. It will stay running and executes *backup-manager* daily.
 
@@ -61,15 +61,11 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 
 * To use encryption, a GPG configuration will have to be mounted at `/root/.gnupg`.
 * GPG encryption will only work with *tar*, *tar.gz*, *tar.bz2* formats.
-* **Uploads**
-  * You can specify multiple hosts for upload, but all will use the same authentication, port and destination folder.
-  * SSH passwords or keys with password are not supported.
-  * rsync shares multiple settings with SSH, including the authentication.
-  * SSH (and FTP) wil only try to upload the archives once. This might make rsync a viable option for instable connections.
-  * rsync will sync the complete folders and it's possible to sync other folders than the archives.
-* **FTP**
-  * The FTP port can't be changed.
-  * Only unencrypted FTP is supported, be careful. ([bug report](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=672236))
-* **The project seems to be stale**
-  * But it mostly relies on bash and CLI tools with a stable interface.
-  * If you can recommend a stable but maintained project for encrypted incremental tar backups, feel free to [let me know](https://github.com/MentalFS).
+* You can specify multiple hosts for upload, but all will use the same authentication, port and destination folder.
+* SSH passwords or keys with password are not supported.
+* SSH and FTP will only try to upload the archives once. This might make rsync a viable option for instable connections.
+* rsync shares multiple settings with SSH, including the authentication.
+* rsync will sync the entire folders including deletions and it's possible to sync other folders than the archives.
+* The FTP port can't be changed.
+* Only unencrypted FTP is supported, be careful. ([bug report](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=672236))
+* **The project seems to be stale**, but it mostly relies on bash and CLI tools with a stable interface.
