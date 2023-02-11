@@ -18,7 +18,7 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 
 | Environment Variable              | Default               |                                                                                             |
 |-----------------------------------|-----------------------|---------------------------------------------------------------------------------------------|
-| `BM_CRON`                         | `0 3 * * *`           | Cron expression when backup-manager should run (defaults to 3:00 every morning)             |
+| `BM_CRON`                         | `0 3 * * *` *(03:00)* | [Cron expression](https://manpages.debian.org/stable/manpages-de/crontab.5) for backups     |
 | `BM_ARCHIVE_METHOD`               | `tarball-incremental` | The backup method to use (*tarball* or *tarball-imcremental*)                               |
 | `BM_ARCHIVE_PREFIX`               | `DOCKER`              | Prefix of every archive on that box                                                         |
 | `BM_ARCHIVE_PURGEDUPS`            | `true`                | Do you want to replace duplicates by symlinks?                                              |
