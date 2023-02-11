@@ -1,5 +1,5 @@
 NAME = mentalfs/backup-manager
-VERSION = SNAPSHOT
+VERSION = latest
 
 .PHONY: build
 
