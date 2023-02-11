@@ -47,15 +47,16 @@ ENV BM_UPLOAD_FTP_HOSTS=""
 ENV BM_UPLOAD_FTP_PURGE="false"
 ENV BM_UPLOAD_FTP_TTL=""
 ENV BM_UPLOAD_FTP_DESTINATION=""
-ENV TZ=Europe/Berlin
 ENV LANG=C.UTF-8
+ENV LOGFILE="messages"
+ENV TZ=Europe/Berlin
 
 # Setup
 RUN set -eux; \
 	mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
 	sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
 	sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
-	touch /var/log/syslog /var/log/user.log
+	touch /var/log/syslog /var/log/user.log /var/log/messages
 
 COPY backup-manager.conf /etc/
 COPY profile.d-timezone.sh /etc/profile.d/01-timezone.sh
@@ -74,7 +75,7 @@ RUN set -eux; \
 	export BM_TARBALL_DIRECTORIES="/root"; \
 	mkdir /var/archives; \
 	bash -lc "sleep 1"; \
-	cat /var/log/syslog; \
+	cat /var/log/${LOGFILE}; \
 	grep @reboot /etc/cron.d/backup-manager; \
 	bash /etc/backup-manager.env; \
 	bash /etc/backup-manager.conf; \
@@ -83,4 +84,4 @@ RUN set -eux; \
 # Release
 FROM build as release
 VOLUME /var/archives
-CMD bash -lc "tail --follow=name -n +1 /var/log/syslog"
+CMD bash -lc "tail --follow=name -n +1 /var/log/${LOGFILE}"

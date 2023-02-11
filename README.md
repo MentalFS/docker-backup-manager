@@ -54,6 +54,7 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 | `BM_UPLOAD_FTP_DESTINATION`       | ` `                   | Destination (path) for FTP uploads                                                          |
 | `BM_UPLOAD_FTP_PURGE`             | `false`               | Purge archives on FTP hosts before uploading? (*true*/*false*)                              |
 | `BM_UPLOAD_FTP_TTL`               | *BM_ARCHIVE_TTL*      | Number of days we have to keep an archive on FTP server (Time To Live)                      |
+| `LOGFILE`                         | `syslog`              | Which logfile in */var/log* to output in the container (*syslog*, *messages* or *user.log*) |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
 
 
