@@ -7,19 +7,8 @@ RUN set -eux; \
 	apt -y install --no-install-recommends \
 		backup-manager \
 		bzip2 dar gettext-base gpg lzma openssh-client rsync xzip zip \
-		cron logrotate rsyslog; \
+		cron logrotate rsyslog tzdata; \
 	apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
-
-# Setup
-RUN set -eux; \
-	mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
-	sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
-	sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
-	touch /var/log/syslog /var/log/user.log
-
-COPY backup-manager.conf /etc/
-COPY profile.d-configuration.sh /etc/profile.d/0-configuration.sh
-COPY profile.d-services.sh /etc/profile.d/1-services.sh
 
 # Configuration
 ENV BM_CRON="0 3 * * *"
@@ -58,12 +47,26 @@ ENV BM_UPLOAD_FTP_HOSTS=""
 ENV BM_UPLOAD_FTP_PURGE="false"
 ENV BM_UPLOAD_FTP_TTL=""
 ENV BM_UPLOAD_FTP_DESTINATION=""
+ENV TZ=Europe/Berlin
+
+# Setup
+RUN set -eux; \
+	mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
+	sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
+	sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
+	touch /var/log/syslog /var/log/user.log
+
+COPY backup-manager.conf /etc/
+COPY profile.d-timezone.sh /etc/profile.d/01-timezone.sh
+COPY profile.d-configuration.sh /etc/profile.d/02-configuration.sh
+COPY profile.d-services.sh /etc/profile.d/99-services.sh
 
 # Tests
 RUN set -eux; \
 	test -x /usr/sbin/backup-manager; \
-	test -x /etc/profile.d/0-configuration.sh; \
-	test -x /etc/profile.d/1-services.sh; \
+	test -x /etc/profile.d/01-timezone.sh; \
+	test -x /etc/profile.d/02-configuration.sh; \
+	test -x /etc/profile.d/99-services.sh; \
 	export BM_CRON=@reboot; \
 	export BM_TARBALL_DIRECTORIES="/root"; \
 	mkdir /var/archives; \
@@ -78,7 +81,6 @@ RUN set -eux; \
 	touch /var/log/syslog /var/log/user.log
 
 # Runtime
-ENV LANG=C.UTF-8
-ENV TZ=Europe/Berlin
 VOLUME /var/archives
+ENV LANG=C.UTF-8
 CMD	bash -lc "tail --follow=name -n +1 /var/log/syslog"
