@@ -1,4 +1,4 @@
-NAME = mentalfs/backup-manager
+NAME = ghcr.io/mentalfs/backup-manager
 
 .PHONY: build build-pull pull test release release-pull
 
