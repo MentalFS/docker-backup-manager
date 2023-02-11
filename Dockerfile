@@ -8,7 +8,7 @@ RUN set -eux; \
 		backup-manager \
 		bzip2 dar gettext-base gpg lzma openssh-client rsync xzip zip \
 		cron logrotate rsyslog; \
-	apt clean; rm -rf /var/lib/apt/lists/* /var/log/*.log
+	apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
 # Setup
 RUN set -eux; \
@@ -18,11 +18,11 @@ RUN set -eux; \
 	touch /var/log/syslog /var/log/user.log
 
 COPY backup-manager.conf /etc/
-COPY cron.daily-backup-manager.sh /etc/cron.daily/1-backup-manager
-COPY profile.d-services.sh /etc/profile.d/services.sh
-COPY profile.d-configuration.sh /etc/profile.d/configuration.sh
+COPY profile.d-configuration.sh /etc/profile.d/0-configuration.sh
+COPY profile.d-services.sh /etc/profile.d/1-services.sh
 
 # Configuration
+ENV BM_CRON="0 3 * * *"
 ENV BM_ARCHIVE_TTL="14"
 ENV BM_REPOSITORY_RECURSIVEPURGE="false"
 ENV BM_ARCHIVE_PURGEDUPS="true"
@@ -62,17 +62,20 @@ ENV BM_UPLOAD_FTP_DESTINATION=""
 # Tests
 RUN set -eux; \
 	test -x /usr/sbin/backup-manager; \
-	test -x /etc/profile.d/services.sh; \
-	test -x /etc/profile.d/configuration.sh; \
-	test -x /etc/cron.daily/1-backup-manager; \
+	test -x /etc/profile.d/0-configuration.sh; \
+	test -x /etc/profile.d/1-services.sh; \
+	export BM_CRON=@reboot; \
 	export BM_TARBALL_DIRECTORIES="/root"; \
 	mkdir /var/archives; \
-	/etc/profile.d/configuration.sh; \
+	bash -lc "sleep 1"; \
+	cat /var/log/syslog; \
+	grep @reboot /etc/cron.d/backup-manager; \
 	bash /etc/backup-manager.env; \
 	bash /etc/backup-manager.conf; \
-	backup-manager; \
 	test -f /var/archives/DOCKER-root.*.master.tar.gz; \
-	rm -rf /etc/backup-manager.env /var/archives
+	rm -rf /var/log/* /var/archives \
+		/etc/backup-manager.env /etc/cron.d/backup-manager; \
+	touch /var/log/syslog /var/log/user.log
 
 # Runtime
 ENV LANG=C.UTF-8

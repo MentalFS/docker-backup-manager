@@ -18,6 +18,7 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 
 | Environment Variable              | Default               |                                                                                   |
 |-----------------------------------|-----------------------|-----------------------------------------------------------------------------------|
+| `BM_CRON`                         | `0 3 * * *`           | Cron expression when backup-manager should run (defaults to 3:00 every morning)   |
 | `BM_ARCHIVE_METHOD`               | `tarball-incremental` | The backup method to use (*tarball* or *tarball-imcremental*)                     |
 | `BM_ARCHIVE_PREFIX`               | `DOCKER`              | Prefix of every archive on that box                                               |
 | `BM_ARCHIVE_PURGEDUPS`            | `true`                | Do you want to replace duplicates by symlinks?                                    |
@@ -70,4 +71,4 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
   * Only unencrypted FTP is supported, be careful. ([bug report](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=672236))
 * **The project seems to be stale**
   * But it mostly relies on bash and CLI tools with a stable interface.
-  * If you can recommend a stable but maintained projed for encrypted incremental tar backups, feel free to [let me know](https://github.com/MentalFS).
+  * If you can recommend a stable but maintained project for encrypted incremental tar backups, feel free to [let me know](https://github.com/MentalFS).
