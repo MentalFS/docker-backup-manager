@@ -2,13 +2,13 @@ FROM debian:stable-slim as build
 
 # Packages
 RUN set -eux; \
-	export DEBIAN_FRONTEND=noninteractive; \
-	apt update; \
-	apt -y install --no-install-recommends \
-		backup-manager \
-		bzip2 dar gettext-base gpg lzma openssh-client rsync xzip zip \
-		cron logrotate rsyslog tzdata; \
-	apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
+    export DEBIAN_FRONTEND=noninteractive; \
+    apt update; \
+    apt -y install --no-install-recommends \
+        backup-manager \
+        bzip2 dar gettext-base gpg lzma openssh-client rsync xzip zip \
+        cron logrotate rsyslog tzdata; \
+    apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
 # Configuration
 ENV BM_CRON="0 3 * * *"
@@ -53,10 +53,10 @@ ENV TZ=Europe/Berlin
 
 # Setup
 RUN set -eux; \
-	mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
-	sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
-	sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
-	touch /var/log/syslog /var/log/user.log /var/log/messages
+    mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
+    sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
+    sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
+    touch /var/log/syslog /var/log/user.log /var/log/messages
 
 COPY backup-manager.conf /etc/
 COPY profile.d-timezone.sh /etc/profile.d/01-timezone.sh
@@ -67,19 +67,19 @@ COPY profile.d-services.sh /etc/profile.d/99-services.sh
 # Tests
 FROM build as test
 RUN set -eux; \
-	test -x /usr/sbin/backup-manager; \
-	test -x /etc/profile.d/01-timezone.sh; \
-	test -x /etc/profile.d/02-configuration.sh; \
-	test -x /etc/profile.d/99-services.sh; \
-	export BM_CRON=@reboot; \
-	export BM_TARBALL_DIRECTORIES="/root"; \
-	mkdir /var/archives; \
-	bash -lc "sleep 1"; \
-	cat /var/log/${LOGFILE}; \
-	grep @reboot /etc/cron.d/backup-manager; \
-	bash /etc/backup-manager.env; \
-	bash /etc/backup-manager.conf; \
-	test -f /var/archives/DOCKER-root.*.master.tar.gz
+    test -x /usr/sbin/backup-manager; \
+    test -x /etc/profile.d/01-timezone.sh; \
+    test -x /etc/profile.d/02-configuration.sh; \
+    test -x /etc/profile.d/99-services.sh; \
+    export BM_CRON=@reboot; \
+    export BM_TARBALL_DIRECTORIES="/root"; \
+    mkdir /var/archives; \
+    bash -lc "sleep 1"; \
+    cat /var/log/${LOGFILE}; \
+    grep @reboot /etc/cron.d/backup-manager; \
+    bash /etc/backup-manager.env; \
+    bash /etc/backup-manager.conf; \
+    test -f /var/archives/DOCKER-root.*.master.tar.gz
 
 # Release
 FROM build as release
