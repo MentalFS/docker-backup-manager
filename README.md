@@ -1,5 +1,5 @@
 # docker-backup-manager
-A Docker image for [Backup-Manager](https://packages.debian.org/stable/backup-manager)
+A Docker image for [Backup-Manager](https://packages.debian.org/stable/backup-manager).
 
 This image is supposed to backup Docker volumes from other containers. It will stay running and executes *backup-manager* daily.
 
@@ -69,3 +69,9 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 * The FTP port can't be changed.
 * Only unencrypted FTP is supported, be careful. ([bug report](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=672236))
 * **The project seems to be stale**, but it mostly relies on bash and CLI tools with a stable interface.
+
+## Alternatives
+
+Since *Backup-Manager* apparently isn't maintained anymore, the following projects might be worth a look:
+* [BorgBackup](https://packages.debian.org/stable/borgbackup)
+* [Backupninja](https://packages.debian.org/stable/backupninja) & [Duplicity](https://packages.debian.org/stable/duplicity)
