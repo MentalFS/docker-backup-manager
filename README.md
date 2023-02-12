@@ -36,6 +36,9 @@ docker run --name backup-manager \
 | Environment Variable              | Default               |                                                                                             |
 |-----------------------------------|-----------------------|---------------------------------------------------------------------------------------------|
 | `BM_CRON`                         | `0 3 * * *` *(03:00)* | [Cron expression](https://manpages.debian.org/stable/manpages-de/crontab.5) for backups     |
+| `BM_REPOSITORY_USER`              | `root`                | The owner of the archive files (UID numbers will work), will have read & write access       |
+| `BM_REPOSITORY_GROUP`             | `root`                | The group of the archive files (GID numbers will work), will have read access only          |
+| `BM_REPOSITORY_RECURSIVEPURGE`    | `false`               | Do you want to purge directories under `BM_REPOSITORY_ROOT`? (*true*/*false*)               |
 | `BM_ARCHIVE_METHOD`               | `tarball-incremental` | The backup method to use (*tarball* or *tarball-imcremental*)                               |
 | `BM_ARCHIVE_PREFIX`               | `DOCKER`              | Prefix of every archive on that box                                                         |
 | `BM_ARCHIVE_PURGEDUPS`            | `true`                | Do you want to replace duplicates by symlinks?                                              |
@@ -43,7 +46,6 @@ docker run --name backup-manager \
 | `BM_ARCHIVE_TTL`                  | `14`                  | Number of days we have to keep an archive (Time To Live)                                    |
 | `BM_ENCRYPTION_METHOD`            | `false`               | Encryption method to use (*gpg* or *false* for no encryption)                               |
 | `BM_ENCRYPTION_RECIPIENT`         | ` `                   | The GPG ID used for encryption of archives                                                  |
-| `BM_REPOSITORY_RECURSIVEPURGE`    | `false`               | Do you want to purge directories under `BM_REPOSITORY_ROOT`? (*true*/*false*)               |
 | `BM_TARBALL_BLACKLIST`            | ` `                   | Files to exclude when generating tarballs                                                   |
 | `BM_TARBALL_DIRECTORIES`          | `/VOLUME/*`           | Targets to backup (may contain wildcards, but no spaces)                                    |
 | `BM_TARBALL_FILETYPE`             | `tar.gz`              | Type of archives (*tar*, *tar.gz*, *tar.bz2*, *tar.xz*, *tar.lzma*, *dar*, *zip*)           |
@@ -57,7 +59,7 @@ docker run --name backup-manager \
 | `BM_UPLOAD_SSH_USER`              | ` `                   | The user to use for the SSH connections/transfers                                           |
 | `BM_UPLOAD_SSH_KEY`               | `/root/.ssh/id_rsa`   | Path to the private key to use for opening the connection (must be mounted)                 |
 | `BM_UPLOAD_SSH_DESTINATION`       | ` `                   | Destination (path) for SSH uploads                                                          |
-| `BM_UPLOAD_SSH_PURGE`             | `false`               | Purge archives on SSH hosts before uploading? (*true*/*false*)                              |
+| `BM_UPLOAD_SSH_PURGE`             | `true`                | Purge archives on SSH hosts before uploading? (*true*/*false*)                              |
 | `BM_UPLOAD_SSH_TTL`               | *BM_ARCHIVE_TTL*      | Number of days we have to keep an archive on SSH server (Time To Live)                      |
 | `BM_UPLOAD_SSHGPG_RECIPIENT`      | ` `                   | The GPG ID used for encryption of SSH uploads (method *ssh-gpg*)                            |
 | `BM_UPLOAD_RSYNC_HOSTS`           | ` `                   | rsync hosts for upload                                                                      |
@@ -69,7 +71,7 @@ docker run --name backup-manager \
 | `BM_UPLOAD_FTP_USER`              | ` `                   | The user to use for the FTP connections/transfers                                           |
 | `BM_UPLOAD_FTP_PASSWORD`          | ` `                   | The FTP user's password                                                                     |
 | `BM_UPLOAD_FTP_DESTINATION`       | ` `                   | Destination (path) for FTP uploads                                                          |
-| `BM_UPLOAD_FTP_PURGE`             | `false`               | Purge archives on FTP hosts before uploading? (*true*/*false*)                              |
+| `BM_UPLOAD_FTP_PURGE`             | `true`                | Purge archives on FTP hosts before uploading? (*true*/*false*)                              |
 | `BM_UPLOAD_FTP_TTL`               | *BM_ARCHIVE_TTL*      | Number of days we have to keep an archive on FTP server (Time To Live)                      |
 | `LOGFILE`                         | `syslog`              | Which logfile in */var/log* to output in the container (*syslog*, *messages* or *user.log*) |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
@@ -79,6 +81,7 @@ docker run --name backup-manager \
 
 * To use encryption, a GPG configuration will have to be mounted at `/root/.gnupg`.
 * GPG encryption will only work with *tar*, *tar.gz*, *tar.bz2* formats.
+* The container currently has to run as *root* and there will likely be files owned by *root* in the archives.
 * You can specify multiple hosts for upload, but all will use the same authentication, port and destination folder.
 * SSH passwords or keys with password are not supported.
 * SSH and FTP will only try to upload the archives once. This might make rsync a viable option for instable connections.
