@@ -6,12 +6,18 @@ This image is supposed to backup Docker volumes from other containers. It will s
 The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configured with the settings below.
 
 
+## User
+
+By default, this image will run as `backup` user. Depending on the volumes it might be neccessary to start the container as `root`.
+Users with UID and GID from 900 to 1100 have also been created.
+Other users will have to be created with a Dockerfile or mounting of */etc/passwd* and */etc/shadow* (with is neither tested nor recommended).
+
+
 ## Volumes
 
 | Path            |                                                                |
 |-----------------|-----------------------------------------------------------------
 | `/var/archives` | Target for the backup archives. Will contain a *.temp* folder. |
-| `/root/.gnupg`  | Optional, GPG configuration folder for encryption              |
 
 
 ## Download
@@ -23,7 +29,7 @@ docker pull ghcr.io/mentalfs/backup-manager
 ## Example
 
 ```bash
-docker run --name backup-manager \
+docker run --user root:backup --name backup-manager \
   -v /path/to/my/archives:/var/archives \
   -v my-first-volume:/VOLUME/my-first-volume \
   -v my-second-volume:/VOLUME/my-second-volume \
@@ -36,8 +42,8 @@ docker run --name backup-manager \
 | Environment Variable              | Default               |                                                                                             |
 |-----------------------------------|-----------------------|---------------------------------------------------------------------------------------------|
 | `BM_CRON`                         | `0 3 * * *` *(03:00)* | [Cron expression](https://manpages.debian.org/stable/manpages-de/crontab.5) for backups     |
-| `BM_REPOSITORY_USER`              | `backup`              | The owner of the archive files (UID numbers will work), will have read & write access       |
-| `BM_REPOSITORY_GROUP`             | `backup`              | The group of the archive files (GID numbers will work), will have read access only          |
+| `BM_REPOSITORY_USER`              | *container user*      | The owner of the archive files (UID numbers will work), will have read & write access       |
+| `BM_REPOSITORY_GROUP`             | *container group*     | The group of the archive files (GID numbers will work), will have read access only          |
 | `BM_REPOSITORY_RECURSIVEPURGE`    | `false`               | Do you want to purge directories under `BM_REPOSITORY_ROOT`? (*true*/*false*)               |
 | `BM_ARCHIVE_METHOD`               | `tarball-incremental` | The backup method to use (*tarball* or *tarball-imcremental*)                               |
 | `BM_ARCHIVE_PREFIX`               | `DOCKER`              | Prefix of every archive on that box                                                         |
@@ -57,7 +63,7 @@ docker run --name backup-manager \
 | `BM_UPLOAD_SSH_HOSTS`             | ` `                   | SSH hosts for upload                                                                        |
 | `BM_UPLOAD_SSH_PORT`              | ` `                   | Port to use for SSH connections (leave blank for default one)                               |
 | `BM_UPLOAD_SSH_USER`              | ` `                   | The user to use for the SSH connections/transfers                                           |
-| `BM_UPLOAD_SSH_KEY`               | `/root/.ssh/id_rsa`   | Path to the private key to use for opening the connection (must be mounted)                 |
+| `BM_UPLOAD_SSH_KEY`               | `/etc/ssh/id_rsa`     | Path to the private key to use for opening the connection (**must be mounted**)             |
 | `BM_UPLOAD_SSH_DESTINATION`       | ` `                   | Destination (path) for SSH uploads                                                          |
 | `BM_UPLOAD_SSH_PURGE`             | `true`                | Purge archives on SSH hosts before uploading? (*true*/*false*)                              |
 | `BM_UPLOAD_SSH_TTL`               | *BM_ARCHIVE_TTL*      | Number of days we have to keep an archive on SSH server (Time To Live)                      |
@@ -73,15 +79,14 @@ docker run --name backup-manager \
 | `BM_UPLOAD_FTP_DESTINATION`       | ` `                   | Destination (path) for FTP uploads                                                          |
 | `BM_UPLOAD_FTP_PURGE`             | `true`                | Purge archives on FTP hosts before uploading? (*true*/*false*)                              |
 | `BM_UPLOAD_FTP_TTL`               | *BM_ARCHIVE_TTL*      | Number of days we have to keep an archive on FTP server (Time To Live)                      |
+| `GNUPGHOME`                       | `/etc/gnupg`          | GPG configuration folder for encryption (**must be mounted**)                               |
 | `LOGFILE`                         | `syslog`              | Which logfile in */var/log* to output in the container (*syslog*, *messages* or *user.log*) |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
 
 
 ## Notes
 
-* To use encryption, a GPG configuration will have to be mounted at `/root/.gnupg`.
 * GPG encryption will only work with *tar*, *tar.gz*, *tar.bz2* formats.
-* The container currently has to run as *root* and there will likely be files owned by *root* in the archives.
 * You can specify multiple hosts for upload, but all will use the same authentication, port and destination folder.
 * SSH passwords or keys with password are not supported.
 * SSH and FTP will only try to upload the archives once. This might make rsync a viable option for instable connections.
