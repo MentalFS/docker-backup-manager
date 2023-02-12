@@ -9,8 +9,7 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 ## User
 
 By default, this image will run as `backup` user. Depending on the volumes it might be neccessary to start the container as `root`.
-Users with UID and GID from 900 to 1100 have also been created.
-Other users will have to be created with a Dockerfile or mounting of */etc/passwd* and */etc/shadow* (with is neither tested nor recommended).
+Users with UID and GID from 900 to 1100 have also been created. Additional users will have to be created with a Dockerfile.
 
 
 ## Volumes
@@ -29,7 +28,7 @@ docker pull ghcr.io/mentalfs/backup-manager
 ## Example
 
 ```bash
-docker run --user root:backup --name backup-manager \
+docker run --user 1000:backup --name backup-manager \
   -v /path/to/my/archives:/var/archives \
   -v my-first-volume:/VOLUME/my-first-volume \
   -v my-second-volume:/VOLUME/my-second-volume \
