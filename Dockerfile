@@ -5,14 +5,14 @@ RUN set -eux; \
     apt update; \
     apt -y install --no-install-recommends \
         backup-manager \
-        bzip2 dar gettext-base gpg lzma openssh-client rsync xzip zip \
+        bzip2 gettext-base gpg lzma openssh-client rsync xz-utils \
         cron logrotate rsyslog sudo tzdata; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
 RUN set -eu; \
     seq 900 1100 | while read NUMBER; do \
-        groupadd -r "group${NUMBER}" -g "${NUMBER}"; \
-        useradd -u "${NUMBER}" -g "group${NUMBER}" -G backup -d /var/backups "user${NUMBER}"; \
+        groupadd -r "gid${NUMBER}" -g "${NUMBER}"; \
+        useradd -u "${NUMBER}" -g "gid${NUMBER}" -G backup -d /var/backups "uid${NUMBER}"; \
     done
 
 RUN set -eux; \
@@ -41,19 +41,18 @@ RUN set -eux; \
 ENV BM_CRON="0 3 * * *"
 ENV BM_REPOSITORY_USER=""
 ENV BM_REPOSITORY_GROUP=""
-ENV BM_ARCHIVE_TTL="14"
 ENV BM_REPOSITORY_RECURSIVEPURGE="false"
 ENV BM_ARCHIVE_PURGEDUPS="true"
 ENV BM_ARCHIVE_PREFIX="DOCKER"
 ENV BM_ARCHIVE_STRICTPURGE="true"
 ENV BM_ARCHIVE_METHOD="tarball-incremental"
+ENV BM_ARCHIVE_TTL="14"
 ENV BM_ENCRYPTION_METHOD="false"
 ENV BM_ENCRYPTION_RECIPIENT=""
 ENV BM_TARBALL_NAMEFORMAT="long"
 ENV BM_TARBALL_FILETYPE="tar.gz"
 ENV BM_TARBALL_DIRECTORIES="/VOLUME/*"
 ENV BM_TARBALL_BLACKLIST=""
-ENV BM_TARBALL_SLICESIZE="1000M"
 ENV BM_TARBALLINC_MASTERDATETYPE="weekly"
 ENV BM_TARBALLINC_MASTERDATEVALUE="1"
 ENV BM_UPLOAD_METHOD="none"
@@ -85,7 +84,7 @@ ENV TZ=Europe/Berlin
 # Tests
 FROM build
 RUN set -eux; \
-    egrep '^user' /etc/passwd | wc -l | egrep '^201$'; \
+    egrep '^uid' /etc/passwd | wc -l | egrep '^201$'; \
     stat -c "%n %U %G %a" /etc/backup-manager.conf; \
     stat -c "%a" /etc/backup-manager.conf | egrep '^644$'; \
     stat -c "%n %U %G %a" /etc/sudoers.d/backup-manager-setup; \
@@ -107,7 +106,8 @@ RUN set -eux; \
     bash /etc/backup-manager.env; \
     bash /etc/backup-manager.conf; \
     ls -lh /var/archives /var/archives/.temp*; \
-    test -f /var/archives/ROOT-root.*.master.tar.gz
+    test -f /var/archives/ROOT-root.*.master.tar.gz; \
+    tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"
 
 FROM build as test
 RUN set -eux; \
@@ -123,7 +123,8 @@ RUN set -eux; \
     /usr/sbin/backup-manager; \
     ls -lh /var/archives /var/archives/.temp*; \
     test -f /var/archives/BACKUP-var-backups.*.master.tar.gz; \
-    stat -c "%U:%G" /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep "backup:backup"
+    stat -c "%U:%G" /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep "backup:backup"; \
+    tar tvzf /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep ".* 34/34 .*"
 
 
 # Release
