@@ -57,7 +57,7 @@ docker run --user 1000:backup --name backup-manager \
 | `BM_TARBALL_NAMEFORMAT`           | `long`                | Archive filename format (*long* or *short*)                                                 |
 | `BM_TARBALLINC_MASTERDATETYPE`    | `weekly`              | Which frequency to use for the master tarball? (*weekly*, *monthly*)                        |
 | `BM_TARBALLINC_MASTERDATEVALUE`   | `1`                   | Number of the day, in the week/month when master tarballs should be made                    |
-| `BM_UPLOAD_METHOD`                | `none`                | Method to use for uploading archives (*scp*, *ssh-gpg*, *ftp*, *rsync* or *none*)           |
+| `BM_UPLOAD_METHOD`                | `none`                | Method to use for uploading archives (*scp*, *ssh-gpg*, *rsync* or *none*)                  |
 | `BM_UPLOAD_SSH_HOSTS`             | ` `                   | SSH hosts for upload                                                                        |
 | `BM_UPLOAD_SSH_PORT`              | ` `                   | Port to use for SSH connections (leave blank for default one)                               |
 | `BM_UPLOAD_SSH_USER`              | ` `                   | The user to use for the SSH connections/transfers                                           |
@@ -71,12 +71,6 @@ docker run --user 1000:backup --name backup-manager \
 | `BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT` | ` `                   | Bandwidth limit for rsync uploads (Example: 32M, 1024K, ...)                                |
 | `BM_UPLOAD_RSYNC_BLACKLIST`       | ` `                   | Files to exclude during rsync uploads                                                       |
 | `BM_UPLOAD_RSYNC_DIRECTORIES`     | `/var/archives`       | Which directories should be backed up with rsync                                            |
-| `BM_UPLOAD_FTP_HOSTS`             | ` `                   | FTP hosts for upload                                                                        |
-| `BM_UPLOAD_FTP_USER`              | ` `                   | The user to use for the FTP connections/transfers                                           |
-| `BM_UPLOAD_FTP_PASSWORD`          | ` `                   | The FTP user's password                                                                     |
-| `BM_UPLOAD_FTP_DESTINATION`       | ` `                   | Destination (path) for FTP uploads                                                          |
-| `BM_UPLOAD_FTP_PURGE`             | `true`                | Purge archives on FTP hosts before uploading? (*true*/*false*)                              |
-| `BM_UPLOAD_FTP_TTL`               | *BM_ARCHIVE_TTL*      | Number of days we have to keep an archive on FTP server (Time To Live)                      |
 | `GNUPGHOME`                       | `/etc/gnupg`          | GPG configuration folder for encryption (**must be mounted**)                               |
 | `LOGFILE`                         | `syslog`              | Which logfile in */var/log* to output in the container (*syslog*, *messages* or *user.log*) |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
@@ -87,11 +81,10 @@ docker run --user 1000:backup --name backup-manager \
 * GPG encryption will only work with *tar*, *tar.gz*, *tar.bz2* formats.
 * You can specify multiple hosts for upload, but all will use the same authentication, port and destination folder.
 * SSH passwords or keys with password are not supported.
-* SSH and FTP will only try to upload the archives once. This might make rsync a viable option for instable connections.
+* SSH will only try to upload the archives once. This might make rsync a viable option for instable connections.
 * rsync shares multiple settings with SSH, including the authentication.
 * rsync will sync the entire folders including deletions and it's possible to sync other folders than the archives.
-* The FTP port can't be changed.
-* Only unencrypted FTP is supported, be careful. ([bug report](https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=672236))
+* FTP uploads have unresolved critical bugs for over 5 years and thus are not supported in this image.
 * **The project seems to be stale**, but it mostly relies on bash and CLI tools with a stable interface.
 
 ## Alternatives
