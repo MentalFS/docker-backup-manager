@@ -1,4 +1,4 @@
-name: docker-cleanup
+name: Docker Cleanup
 
 on:
   schedule:
