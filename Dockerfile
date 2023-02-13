@@ -99,7 +99,7 @@ RUN set -eux; \
     grep @reboot /etc/cron.d/backup-manager; \
     bash /etc/backup-manager.env; \
     bash /etc/backup-manager.conf; \
-    ls -lh /var/archives /var/archives/.temp*; \
+    ls -lhR /var/archives; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
     tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"
 
@@ -115,7 +115,7 @@ RUN set -eux; \
     cat /etc/cron.d/backup-manager; \
     grep " backup " /etc/cron.d/backup-manager; \
     /usr/sbin/backup-manager; \
-    ls -lh /var/archives /var/archives/.temp*; \
+    ls -lhR /var/archives; \
     test -f /var/archives/BACKUP-var-backups.*.master.tar.gz; \
     stat -c "%U:%G" /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep "backup:backup"; \
     tar tvzf /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep ".* 34/34 .*"
