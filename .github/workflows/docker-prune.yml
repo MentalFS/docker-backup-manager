@@ -1,4 +1,4 @@
-name: Docker Cleanup
+name: Docker Prune
 
 on:
   schedule:
@@ -14,7 +14,7 @@ jobs:
         token: ${{ secrets.PACKAGE_DELETE_TOKEN }}
         user: mentalfs
         container: backup-manager
-        dry-run: true # Dry-run first, then change to `false`
+        dry-run: false
         keep-younger-than: 7 # days
         keep-last: 2
         prune-untagged: true
