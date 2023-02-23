@@ -9,12 +9,6 @@ RUN set -eux; \
         cron logrotate rsyslog sudo tzdata; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
-RUN set -eu; \
-    seq 900 1100 | while read NUMBER; do \
-        groupadd -r "gid${NUMBER}" -g "${NUMBER}"; \
-        useradd -u "${NUMBER}" -g "gid${NUMBER}" -G backup -d /var/backups "uid${NUMBER}"; \
-    done
-
 RUN set -eux; \
     sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
     sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
@@ -38,47 +32,46 @@ RUN set -eux; \
 
 
 # Configuration
-ENV BM_CRON="0 3 * * *"
-ENV BM_REPOSITORY_USER=""
-ENV BM_REPOSITORY_GROUP=""
-ENV BM_REPOSITORY_RECURSIVEPURGE="false"
-ENV BM_ARCHIVE_PURGEDUPS="true"
-ENV BM_ARCHIVE_PREFIX="DOCKER"
-ENV BM_ARCHIVE_STRICTPURGE="true"
-ENV BM_ARCHIVE_METHOD="tarball-incremental"
-ENV BM_ARCHIVE_TTL="14"
-ENV BM_ENCRYPTION_METHOD="false"
-ENV BM_ENCRYPTION_RECIPIENT=""
-ENV BM_TARBALL_NAMEFORMAT="long"
-ENV BM_TARBALL_FILETYPE="tar.gz"
-ENV BM_TARBALL_DIRECTORIES="/VOLUME/*"
-ENV BM_TARBALL_BLACKLIST=""
-ENV BM_TARBALLINC_MASTERDATETYPE="weekly"
-ENV BM_TARBALLINC_MASTERDATEVALUE="1"
-ENV BM_UPLOAD_METHOD="none"
-ENV BM_UPLOAD_SSH_USER=""
-ENV BM_UPLOAD_SSH_KEY="/etc/ssh/id_rsa"
-ENV BM_UPLOAD_SSH_HOSTS=""
-ENV BM_UPLOAD_SSH_PORT=""
-ENV BM_UPLOAD_SSH_DESTINATION=""
-ENV BM_UPLOAD_SSH_PURGE="true"
-ENV BM_UPLOAD_SSH_TTL=""
-ENV BM_UPLOAD_SSHGPG_RECIPIENT=""
-ENV BM_UPLOAD_RSYNC_DIRECTORIES="/var/archives"
-ENV BM_UPLOAD_RSYNC_DESTINATION=""
-ENV BM_UPLOAD_RSYNC_HOSTS=""
-ENV BM_UPLOAD_RSYNC_BLACKLIST=""
-ENV BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT=""
-ENV GNUPGHOME="/etc/gnupg"
-ENV LANG=C.UTF-8
-ENV LOGFILE="messages"
-ENV TZ=Europe/Berlin
+ENV BM_CRON="0 3 * * *" \
+    BM_REPOSITORY_USER="" \
+    BM_REPOSITORY_GROUP="" \
+    BM_REPOSITORY_RECURSIVEPURGE="false" \
+    BM_ARCHIVE_PURGEDUPS="true" \
+    BM_ARCHIVE_PREFIX="DOCKER" \
+    BM_ARCHIVE_STRICTPURGE="true" \
+    BM_ARCHIVE_METHOD="tarball-incremental" \
+    BM_ARCHIVE_TTL="14" \
+    BM_ENCRYPTION_METHOD="false" \
+    BM_ENCRYPTION_RECIPIENT="" \
+    BM_TARBALL_NAMEFORMAT="long" \
+    BM_TARBALL_FILETYPE="tar.gz" \
+    BM_TARBALL_DIRECTORIES="/VOLUME/*" \
+    BM_TARBALL_BLACKLIST="" \
+    BM_TARBALLINC_MASTERDATETYPE="weekly" \
+    BM_TARBALLINC_MASTERDATEVALUE="1" \
+    BM_UPLOAD_METHOD="none" \
+    BM_UPLOAD_SSH_USER="" \
+    BM_UPLOAD_SSH_KEY="/etc/ssh/id_rsa" \
+    BM_UPLOAD_SSH_HOSTS="" \
+    BM_UPLOAD_SSH_PORT="" \
+    BM_UPLOAD_SSH_DESTINATION="" \
+    BM_UPLOAD_SSH_PURGE="true" \
+    BM_UPLOAD_SSH_TTL="" \
+    BM_UPLOAD_SSHGPG_RECIPIENT="" \
+    BM_UPLOAD_RSYNC_DIRECTORIES="/var/archives" \
+    BM_UPLOAD_RSYNC_DESTINATION="" \
+    BM_UPLOAD_RSYNC_HOSTS="" \
+    BM_UPLOAD_RSYNC_BLACKLIST="" \
+    BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT="" \
+    GNUPGHOME="/etc/gnupg" \
+    LANG=C.UTF-8 \
+    LOGFILE="messages" \
+    TZ=Europe/Berlin
 
 
 # Tests
 FROM build
 RUN set -eux; \
-    egrep '^uid' /etc/passwd | wc -l | egrep '^201$'; \
     stat -c "%n %U %G %a" /etc/backup-manager.conf; \
     stat -c "%a" /etc/backup-manager.conf | egrep '^644$'; \
     stat -c "%n %U %G %a" /etc/sudoers.d/backup-manager-setup; \

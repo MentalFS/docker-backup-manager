@@ -9,7 +9,6 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 ## User
 
 By default, this image will run as `backup` user. Depending on the volumes it might be neccessary to start the container as `root`.
-Users with UID and GID from 900 to 1100 have also been created. Additional users will have to be created with a Dockerfile.
 
 
 ## Volumes
