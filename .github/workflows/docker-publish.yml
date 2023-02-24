@@ -50,7 +50,7 @@ jobs:
         uses: lucacome/docker-image-update-checker@v1
         with:
           base-image: debian:stable-slim
-          image: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
 
       # Build and push Docker image with Buildx
       # https://github.com/docker/build-push-action
