@@ -12,7 +12,7 @@ env:
   TAG: latest
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,7 +43,16 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      # Build and push Docker image with Buildx (don't push on PR)
+      # Check for update of base image
+      # https://github.com/lucacome/docker-image-update-checker
+      - name: Check if update available
+        id: check
+        uses: lucacome/docker-image-update-checker@v1
+        with:
+          base-image: debian:stable-slim
+          image: ${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
+      # Build and push Docker image with Buildx
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
         id: build-and-push
@@ -55,3 +64,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           push: true
+        if: github.event_name == 'push' || steps.check.outputs.needs-updating == 'true'
