@@ -69,7 +69,7 @@ docker run --user 1000:backup --name backup-manager \
 | `BM_UPLOAD_RSYNC_DESTINATION`     | ` `                   | Destination (path) for rsync uploads                                                        |
 | `BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT` | ` `                   | Bandwidth limit for rsync uploads (Example: 32M, 1024K, ...)                                |
 | `BM_UPLOAD_RSYNC_BLACKLIST`       | ` `                   | Files to exclude during rsync uploads                                                       |
-| `BM_UPLOAD_RSYNC_DIRECTORIES`     | `/var/archives`       | Which directories should be backed up with rsync                                            |
+| `BM_UPLOAD_RSYNC_DIRECTORIES`     | `/var/archives/`      | Which directories should be backed up with rsync                                            |
 | `GNUPGHOME`                       | `/etc/gnupg`          | GPG configuration folder for encryption (**must be mounted if used**)                       |
 | `LOGFILE`                         | `syslog`              | Which logfile in */var/log* to output in the container (*syslog*, *messages* or *user.log*) |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
