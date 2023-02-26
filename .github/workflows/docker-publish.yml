@@ -28,6 +28,7 @@ jobs:
         with:
           parent-image: debian:stable-slim
           my-image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+        if: github.event_name == 'schedule'
 
       - name: Checkout repository
         uses: actions/checkout@v3
