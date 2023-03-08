@@ -1,7 +1,7 @@
 #!/command/with-contenv sh
 
 mkdir -p /etc/cron.d
-echo "${BM_CRON} /command/backup-manager >/dev/null" >> /var/spool/cron/crontabs/root
+echo "${BM_CRON} /command/backup-manager" >> /var/spool/cron/crontabs/root
 sort -u  /var/spool/cron/crontabs/root -o  /var/spool/cron/crontabs/root
 
 crond -f -S -l 5

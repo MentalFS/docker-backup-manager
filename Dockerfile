@@ -5,7 +5,7 @@ ADD "https://github.com/sukria/Backup-Manager/archive/refs/tags/${BM_VERSION}.ta
 
 FROM alpine AS build
 RUN apk add s6-overlay s6-overlay-syslogd tzdata
-RUN apk add bash bzip2 coreutils gpg gzip make perl openssh-client rsync tar xz
+RUN apk add bash bzip2 coreutils gpg gzip make openssh-client perl rsync tar xz
 COPY --from=download /root/Backup-Manager-*.tar.gz /root/
 RUN set -eux; \
     cd /root; \
@@ -57,7 +57,6 @@ ENV BM_CRON="0 3 * * *" \
     BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT="" \
     GNUPGHOME="/etc/gnupg" \
     LANG=C.UTF-8 \
-    LOGFILE="messages" \
     TZ=Europe/Berlin
 
 
@@ -73,15 +72,15 @@ RUN set -eux; \
 ENV BM_CRON=@reboot \
     BM_TARBALL_DIRECTORIES="/root" \
     BM_ARCHIVE_PREFIX="ROOT" \
-    BM_REPOSITORY_USER="33" \
-    BM_REPOSITORY_GROUP="33"
-RUN ["/init", "sleep", "1"]
+    BM_REPOSITORY_USER="1000" \
+    BM_REPOSITORY_GROUP="1000"
+RUN ["/init", "sleep", "5"]
 RUN set -eux; \
     cat /var/spool/cron/crontabs/root; \
-    cat /var/log/syslogd/${LOGFILE}/current; \
+    cat /var/log/syslogd/messages/current; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
     ls -lhRn /var/archives; \
-    ls -lhRn /var/archives | egrep "^-rw-r----- 1 33 33 .* ROOT-root.20230308.master.tar.gz$"; \
+    ls -lhRn /var/archives | egrep "^-rw-r----- 1 1000 1000 .* ROOT-root\.[0-9]*\.master\.tar\.gz$"; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
     tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"
 
@@ -89,4 +88,3 @@ RUN set -eux; \
 # Release
 FROM build AS release
 VOLUME /var/archives
-CMD s6-logwatch "/var/log/syslogd/${LOGFILE}"
