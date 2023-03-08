@@ -1,9 +1,12 @@
 NAME = backup-manager
 
-.PHONY: build build-pull pull test release release-pull
+.PHONY: build build-pull build-only pull test release release-pull
 
 build:
 	docker build -t $(NAME):build .
+
+build-only:
+	docker build -t $(NAME):build --target=build .
 
 build-pull:
 	docker build --pull -t $(NAME):build .

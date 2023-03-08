@@ -6,11 +6,6 @@ This image is supposed to backup Docker volumes from other containers. It will s
 The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configured with the settings below.
 
 
-## User
-
-By default, this image will run as `backup` user. Depending on the volumes it might be neccessary to start the container as `root`.
-
-
 ## Volumes
 
 | Path            |                                                                |
@@ -27,7 +22,7 @@ docker pull ghcr.io/mentalfs/backup-manager
 ## Example
 
 ```bash
-docker run --user 1000:backup --name backup-manager \
+docker run --name backup-manager \
   -v /path/to/my/archives:/var/archives \
   -v my-first-volume:/VOLUME/my-first-volume \
   -v my-second-volume:/VOLUME/my-second-volume \
@@ -40,8 +35,8 @@ docker run --user 1000:backup --name backup-manager \
 | Environment Variable              | Default               |                                                                                             |
 |-----------------------------------|-----------------------|---------------------------------------------------------------------------------------------|
 | `BM_CRON`                         | `0 3 * * *` *(03:00)* | [Cron expression](https://manpages.debian.org/stable/manpages-de/crontab.5) for backups     |
-| `BM_REPOSITORY_USER`              | *container user*      | The owner of the archive files (UID numbers will work), will have read & write access       |
-| `BM_REPOSITORY_GROUP`             | *container group*     | The group of the archive files (GID numbers will work), will have read access only          |
+| `BM_REPOSITORY_USER`              | `root`                | The owner of the archive files (UID numbers will work), will have read & write access       |
+| `BM_REPOSITORY_GROUP`             | `root`                | The group of the archive files (GID numbers will work), will have read access only          |
 | `BM_REPOSITORY_RECURSIVEPURGE`    | `false`               | Do you want to purge directories under `BM_REPOSITORY_ROOT`? (*true*/*false*)               |
 | `BM_ARCHIVE_METHOD`               | `tarball-incremental` | The backup method to use (*tarball* or *tarball-imcremental*)                               |
 | `BM_ARCHIVE_PREFIX`               | `DOCKER`              | Prefix of every archive on that box                                                         |
@@ -71,7 +66,7 @@ docker run --user 1000:backup --name backup-manager \
 | `BM_UPLOAD_RSYNC_BLACKLIST`       | ` `                   | Files to exclude during rsync uploads                                                       |
 | `BM_UPLOAD_RSYNC_DIRECTORIES`     | `/var/archives/`      | Which directories should be backed up with rsync                                            |
 | `GNUPGHOME`                       | `/etc/gnupg`          | GPG configuration folder for encryption (**must be mounted if used**)                       |
-| `LOGFILE`                         | `syslog`              | Which logfile in */var/log* to output in the container (*syslog*, *messages* or *user.log*) |
+| `LOGFILE`                         | `messages`            | Which log in */var/log/syslogd* to print to console (*everything*, *messages* or *user*)    |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
 
 

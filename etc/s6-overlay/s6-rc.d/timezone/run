@@ -1,0 +1,7 @@
+#!/command/with-contenv sh
+
+test -e "/usr/share/zoneinfo/${TZ}" || exit 1
+
+ln -s "/usr/share/zoneinfo/${TZ}" /etc/localtime
+echo "$TZ" > /etc/timezone
+

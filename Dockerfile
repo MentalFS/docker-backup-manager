@@ -1,40 +1,32 @@
-FROM debian:stable-slim as build
+FROM scratch AS download
+ARG BM_VERSION=0.7.14
+ADD "https://github.com/sukria/Backup-Manager/archive/refs/tags/${BM_VERSION}.tar.gz" "/root/Backup-Manager-${BM_VERSION}.tar.gz"
 
+
+FROM alpine AS build
+RUN apk add s6-overlay s6-overlay-syslogd tzdata
+RUN apk add bash bzip2 coreutils gpg gzip make perl openssh-client rsync tar xz
+COPY --from=download /root/Backup-Manager-*.tar.gz /root/
 RUN set -eux; \
-    export DEBIAN_FRONTEND=noninteractive; \
-    apt update; \
-    apt -y install --no-install-recommends \
-        backup-manager \
-        bzip2 gettext-base gpg lzma openssh-client rsync xz-utils \
-        cron logrotate rsyslog sudo tzdata; \
-    apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
-
+    cd /root; \
+    tar xzf Backup-Manager-*.tar.gz; \
+    cd Backup-Manager-*/; \
+    make install_binary; \
+    cd -; \
+    rm -rf Backup-Manager-*/
 RUN set -eux; \
-    sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
-    sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
-    mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
-    chown backup:backup /var/backups; \
-    chmod g+rw /var/backups
-
-COPY backup-manager.conf /etc/
-COPY sudoers.d-setup.conf /etc/sudoers.d/backup-manager-setup
-COPY profile.d-setup.sh /etc/profile.d/00-backup-manager-setup.sh
-COPY bin-setup.sh /usr/local/bin/backup-manager-setup
-COPY bin-log.sh /usr/local/bin/backup-manager-log
-
-RUN set -eux; \
-    chmod a+r /etc/backup-manager.conf; \
-    chmod a-w,o-r /etc/sudoers.d/backup-manager-setup; \
-    chmod a+rx /etc/profile.d/00-backup-manager-setup.sh; \
-    chmod a+rx /usr/local/bin/backup-manager-setup; \
-    chmod a+rx /usr/local/bin/backup-manager-log; \
-    touch /var/log/syslog /var/log/user.log /var/log/messages
-
+    echo "#!/command/with-contenv sh" >/command/backup-manager; \
+    echo "/usr/local/sbin/backup-manager" >>/command/backup-manager; \
+    chmod a+x /command/backup-manager; \
+    ln -s /command/backup-manager /command/run; \
+    ln -s /etc/backup-manager/backup-manager.conf /etc/backup-manager.conf
+COPY ./etc/ /etc/
+ENTRYPOINT ["/init"]
 
 # Configuration
 ENV BM_CRON="0 3 * * *" \
-    BM_REPOSITORY_USER="" \
-    BM_REPOSITORY_GROUP="" \
+    BM_REPOSITORY_USER="root" \
+    BM_REPOSITORY_GROUP="root" \
     BM_REPOSITORY_RECURSIVEPURGE="false" \
     BM_ARCHIVE_PURGEDUPS="true" \
     BM_ARCHIVE_PREFIX="DOCKER" \
@@ -69,53 +61,32 @@ ENV BM_CRON="0 3 * * *" \
     TZ=Europe/Berlin
 
 
-# Tests
-FROM build
+# Test
+FROM build AS test
 RUN set -eux; \
-    stat -c "%n %U %G %a" /etc/backup-manager.conf; \
-    stat -c "%a" /etc/backup-manager.conf | egrep '^644$'; \
-    stat -c "%n %U %G %a" /etc/sudoers.d/backup-manager-setup; \
-    stat -c "%a" /etc/sudoers.d/backup-manager-setup | egrep '^440$'; \
-    stat -c "%n %U %G %a" /etc/profile.d/00-backup-manager-setup.sh; \
-    stat -c "%a" /etc/profile.d/00-backup-manager-setup.sh | egrep '^755$'; \
-    stat -c "%n %U %G %a" /usr/local/bin/backup-manager-setup; \
-    stat -c "%a" /usr/local/bin/backup-manager-setup | egrep '^755$'; \
-    stat -c "%n %U %G %a" /usr/local/bin/backup-manager-log; \
-    stat -c "%a" /usr/local/bin/backup-manager-log | egrep '^755$'; \
-    export BM_CRON=@reboot; \
-    export BM_TARBALL_DIRECTORIES="/root"; \
-    export BM_ARCHIVE_PREFIX="ROOT"; \
-    mkdir /var/archives; \
-    sudo -E bash -lc "sleep 1"; \
-    cat /var/log/${LOGFILE}; \
-    cat /etc/cron.d/backup-manager; \
-    grep @reboot /etc/cron.d/backup-manager; \
-    bash /etc/backup-manager.env; \
-    bash /etc/backup-manager.conf; \
-    ls -lhR /var/archives; \
+	test -e /root; test -r /root; \
+    chmod a+rX /root -R; \
+    ls -lha /root; \
+    stat -c "%n %U %G %a" /etc/backup-manager/backup-manager.conf; \
+    stat -c "%a" /etc/backup-manager/backup-manager.conf | egrep '^644$'; \
+    mkdir -p /var/archives/.temp
+ENV BM_CRON=@reboot \
+    BM_TARBALL_DIRECTORIES="/root" \
+    BM_ARCHIVE_PREFIX="ROOT" \
+    BM_REPOSITORY_USER="33" \
+    BM_REPOSITORY_GROUP="33"
+RUN ["/init", "sleep", "1"]
+RUN set -eux; \
+    cat /var/spool/cron/crontabs/root; \
+    cat /var/log/syslogd/${LOGFILE}/current; \
+    find /var/archives/.temp/ -type f -exec cat {} + ; \
+    ls -lhRn /var/archives; \
+    ls -lhRn /var/archives | egrep "^-rw-r----- 1 33 33 .* ROOT-root.20230308.master.tar.gz$"; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
     tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"
 
-FROM build as test
-RUN set -eux; \
-    mkdir /var/archives; \
-    chown backup:backup /var/archives
-USER backup:backup
-RUN set -eux; \
-    export BM_TARBALL_DIRECTORIES="/var/backups"; \
-    export BM_ARCHIVE_PREFIX="BACKUP"; \
-    /etc/profile.d/00-backup-manager-setup.sh; \
-    cat /etc/cron.d/backup-manager; \
-    grep " backup " /etc/cron.d/backup-manager; \
-    /usr/sbin/backup-manager; \
-    ls -lhR /var/archives; \
-    test -f /var/archives/BACKUP-var-backups.*.master.tar.gz; \
-    stat -c "%U:%G" /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep "backup:backup"; \
-    tar tvzf /var/archives/BACKUP-var-backups.*.master.tar.gz | egrep ".* 34/34 .*"
-
 
 # Release
-FROM build as release
-USER backup:backup
+FROM build AS release
 VOLUME /var/archives
-CMD /usr/local/bin/backup-manager-log "${LOGFILE}"
+CMD s6-logwatch "/var/log/syslogd/${LOGFILE}"
