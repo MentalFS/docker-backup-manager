@@ -26,7 +26,7 @@ jobs:
         id: check
         uses: twiddler/is-my-docker-parent-image-out-of-date@v1
         with:
-          parent-image: debian:stable-slim
+          parent-image: alpine:latest
           my-image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
         if: github.event_name == 'schedule'
 
