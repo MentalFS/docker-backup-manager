@@ -4,7 +4,7 @@ ADD "https://github.com/sukria/Backup-Manager/archive/refs/tags/${BM_VERSION}.ta
 
 
 FROM alpine:3.18.0 AS build
-RUN apk add --no-cache s6-overlay s6-overlay-syslogd tzdata
+RUN apk add --no-cache s6-overlay s6-overlay-syslogd ca-certificates tzdata
 RUN apk add --no-cache perl # largest dep
 RUN apk add --no-cache bash bzip2 coreutils gpg gzip make openssh-client rsync tar xz
 COPY --from=download /root/Backup-Manager-*.tar.gz /root/
