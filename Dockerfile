@@ -1,4 +1,16 @@
-FROM debian:stable-20230612-slim AS debian-s6-base
+FROM scratch as s6-download
+
+ARG ARCH=x86_64
+
+ARG S6_DOWNLOAD_BASE="https://github.com/just-containers/s6-overlay/releases/latest/download"
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-noarch.tar.xz" /
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-${ARCH}.tar.xz" /
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-noarch.tar.xz" /
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-arch.tar.xz" /
+ADD "${S6_DOWNLOAD_BASE}/syslogd-overlay-noarch.tar.xz" /
+
+
+FROM debian:stable-20230612-slim AS s6-base
 
 ARG ARCH=x86_64
 
@@ -6,26 +18,26 @@ RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
     apt update; \
     apt -y install --no-install-recommends \
-        s6 cron tzdata xz-utils; \
+        cron tzdata xz-utils; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
-ARG S6_DOWNLOAD_BASE="https://github.com/just-containers/s6-overlay/releases/latest/download"
-ADD "${S6_DOWNLOAD_BASE}/s6-overlay-noarch.tar.xz" /tmp
-ADD "${S6_DOWNLOAD_BASE}/s6-overlay-${ARCH}.tar.xz" /tmp
-ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-noarch.tar.xz" /tmp
-ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-arch.tar.xz" /tmp
-ADD "${S6_DOWNLOAD_BASE}/syslogd-overlay-noarch.tar.xz" /tmp
+COPY --from=s6-download "/s6-overlay-noarch.tar.xz" /tmp
+COPY --from=s6-download "/s6-overlay-${ARCH}.tar.xz" /tmp
+COPY --from=s6-download "/s6-overlay-symlinks-noarch.tar.xz" /tmp
+COPY --from=s6-download "/s6-overlay-symlinks-arch.tar.xz" /tmp
+COPY --from=s6-download "/syslogd-overlay-noarch.tar.xz" /tmp
+
 RUN set -eux; \
     tar -C / -Jxpf "/tmp/s6-overlay-noarch.tar.xz"; \
     tar -C / -Jxpf "/tmp/s6-overlay-${ARCH}.tar.xz"; \
     tar -C / -Jxpf "/tmp/s6-overlay-symlinks-noarch.tar.xz"; \
     tar -C / -Jxpf "/tmp/s6-overlay-symlinks-arch.tar.xz"; \
-    tar -C / -Jxpf /tmp/syslogd-overlay-noarch.tar.xz
+    tar -C / -Jxpf "/tmp/syslogd-overlay-noarch.tar.xz"
 
 ENTRYPOINT ["/init"]
 
 
-FROM debian-s6-base AS build
+FROM s6-base AS build
 
 RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
