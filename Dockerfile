@@ -1,28 +1,48 @@
-FROM scratch AS download
-ARG BM_VERSION=0.7.14
-ADD "https://github.com/sukria/Backup-Manager/archive/refs/tags/${BM_VERSION}.tar.gz" "/root/Backup-Manager-${BM_VERSION}.tar.gz"
+FROM debian:stable-20230612-slim AS debian-s6-base
 
+ARG ARCH=x86_64
 
-FROM alpine:3.18.2 AS build
-RUN apk add --no-cache s6-overlay s6-overlay-syslogd ca-certificates tzdata
-RUN apk add --no-cache perl # largest dep
-RUN apk add --no-cache bash bzip2 coreutils gpg gzip make openssh-client rsync tar xz
-COPY --from=download /root/Backup-Manager-*.tar.gz /root/
 RUN set -eux; \
-    cd /root; \
-    tar xzf Backup-Manager-*.tar.gz; \
-    cd Backup-Manager-*/; \
-    make install_binary; \
-    cd -; \
-    rm -rf Backup-Manager-*/
+    export DEBIAN_FRONTEND=noninteractive; \
+    apt update; \
+    apt -y install --no-install-recommends \
+        s6 cron tzdata xz-utils; \
+    apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
+
+ARG S6_DOWNLOAD_BASE="https://github.com/just-containers/s6-overlay/releases/latest/download"
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-noarch.tar.xz" /tmp
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-${ARCH}.tar.xz" /tmp
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-noarch.tar.xz" /tmp
+ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-arch.tar.xz" /tmp
+ADD "${S6_DOWNLOAD_BASE}/syslogd-overlay-noarch.tar.xz" /tmp
+RUN set -eux; \
+    tar -C / -Jxpf "/tmp/s6-overlay-noarch.tar.xz"; \
+    tar -C / -Jxpf "/tmp/s6-overlay-${ARCH}.tar.xz"; \
+    tar -C / -Jxpf "/tmp/s6-overlay-symlinks-noarch.tar.xz"; \
+    tar -C / -Jxpf "/tmp/s6-overlay-symlinks-arch.tar.xz"; \
+    tar -C / -Jxpf /tmp/syslogd-overlay-noarch.tar.xz
+
+ENTRYPOINT ["/init"]
+
+
+FROM debian-s6-base AS build
+
+RUN set -eux; \
+    export DEBIAN_FRONTEND=noninteractive; \
+    apt update; \
+    apt -y install --no-install-recommends \
+        backup-manager \
+        bzip2 gettext-base gpg lzma openssh-client rsync; \
+    apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
+
 RUN set -eux; \
     echo "#!/command/with-contenv sh" >/command/backup-manager; \
-    echo "/usr/local/sbin/backup-manager" >>/command/backup-manager; \
+    echo "/usr/sbin/backup-manager" >>/command/backup-manager; \
     chmod a+x /command/backup-manager; \
     ln -s /command/backup-manager /command/run; \
+    mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
     ln -s /etc/backup-manager/backup-manager.conf /etc/backup-manager.conf
 COPY ./etc/ /etc/
-ENTRYPOINT ["/init"]
 
 # Configuration
 ENV BM_CRON="0 3 * * *" \
@@ -77,7 +97,7 @@ ENV BM_CRON=@reboot \
     BM_REPOSITORY_GROUP="1000"
 RUN ["/init", "sleep", "5"]
 RUN set -eux; \
-    cat /var/spool/cron/crontabs/root; \
+    cat /etc/cron.d/backup-manager; \
     cat /var/log/syslogd/messages/current; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
     ls -lhRn /var/archives; \

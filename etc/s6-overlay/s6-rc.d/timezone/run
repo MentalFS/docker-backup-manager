@@ -2,6 +2,7 @@
 
 test -e "/usr/share/zoneinfo/${TZ}" || exit 1
 
+test -e /etc/localtime && mv /etc/localtime /etc/localtime.orig
 ln -s "/usr/share/zoneinfo/${TZ}" /etc/localtime
 echo "$TZ" > /etc/timezone
 
