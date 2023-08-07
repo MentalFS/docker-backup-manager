@@ -25,7 +25,7 @@ jobs:
           container: backup-manager
           dry-run: false
           keep-younger-than: 7
-          keep-last: 2
+          keep-last: 7
           prune-untagged: true
 
       - name: Checkout repository
