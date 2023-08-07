@@ -10,7 +10,7 @@ ADD "${S6_DOWNLOAD_BASE}/s6-overlay-symlinks-arch.tar.xz" /
 ADD "${S6_DOWNLOAD_BASE}/syslogd-overlay-noarch.tar.xz" /
 
 
-FROM debian:stable-20230612-slim AS s6-base
+FROM debian:stable-20230725-slim AS s6-base
 
 ARG ARCH=x86_64
 
