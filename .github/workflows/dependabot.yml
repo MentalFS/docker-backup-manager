@@ -16,18 +16,6 @@ jobs:
     if: ${{ github.actor == 'dependabot[bot]' }}
 
     steps:
-      - name: Prune images older than 7 days
-        if: ${{ github.ref != 'refs/heads/main' }}
-        uses: vlaurin/action-ghcr-prune@v0.5.0
-        with:
-          token: ${{ secrets.PACKAGE_DELETE_TOKEN }}
-          user: mentalfs
-          container: backup-manager
-          dry-run: false
-          keep-younger-than: 7
-          keep-last: 16
-          prune-untagged: true
-
       - name: Checkout repository
         uses: actions/checkout@v3
 
