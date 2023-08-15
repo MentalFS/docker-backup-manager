@@ -1,5 +1,5 @@
 name: Docker
-on: 
+on:
   - push
   - schedule:
     - cron: '15 17 1,15 * TUE-SAT'
