@@ -73,7 +73,6 @@ docker run --name backup-manager \
 
 ## Notes
 
-* This images uses [S6-Overlay](https://github.com/just-containers/s6-overlay). The `Dockerfile` downloads the latest release from GitHub.
 * GPG encryption will only work with *tar*, *tar.gz*, *tar.bz2* formats.
 * You can specify multiple hosts for upload, but all will use the same authentication, port and destination folder.
 * SSH passwords or keys with password are not supported.

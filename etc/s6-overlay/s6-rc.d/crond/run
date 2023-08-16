@@ -1,6 +1,0 @@
-#!/command/with-contenv sh
-
-mkdir -p /etc/cron.d
-echo "${BM_CRON} root /command/backup-manager" >> /etc/cron.d/backup-manager
-
-cron -f -l 5

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+echo Loading configuration
+mkdir -p /etc/cron.d
+echo "${BM_CRON} root /backup-manager" >> /etc/cron.d/backup-manager
+env >> /etc/environment
+rsyslogd &
+
+echo Running "$@"
+exec "$@"
