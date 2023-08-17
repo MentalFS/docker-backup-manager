@@ -6,8 +6,7 @@ build:
 	docker build -t $(NAME):build .
 
 pull:
-	docker build --pull -t $(NAME):download --target=download .
-	docker build --pull --target=build .
+	docker build --pull --target=test .
 
 test:
 	docker build --target=test .
