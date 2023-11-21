@@ -1,4 +1,4 @@
-FROM debian:stable-20231030-slim AS build
+FROM debian:stable-20231120-slim AS build
 
 # Setup
 RUN set -eux; \
