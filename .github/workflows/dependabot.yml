@@ -12,8 +12,6 @@ env:
   IMAGE_NAME: backup-manager
   TAG: latest
 
-  BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-
 jobs:
   docker:
     runs-on: ubuntu-latest
@@ -45,7 +43,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          platforms: linux/amd64
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_AUTHOR }}/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
