@@ -105,5 +105,5 @@ RUN ls -lhRn /tmp; echo "Tests successful!"
 
 # Release
 FROM build AS release
-HEALTHCHECK --interval=5m CMD test -f /tmp/unhealty && exit 1
+HEALTHCHECK --interval=5m CMD ! test -f /tmp/unhealty || exit 1
 VOLUME /var/archives
