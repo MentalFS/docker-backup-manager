@@ -1,3 +1,5 @@
 #!/bin/sh
 
-/usr/sbin/backup-manager --verbose >/proc/1/fd/1 2>/proc/1/fd/2
+rm -f /tmp/unhealthy
+/usr/sbin/backup-manager --verbose >/proc/1/fd/1 2>/proc/1/fd/2 \
+|| touch /tmp/unhealthy

@@ -20,6 +20,7 @@ RUN set -eux; \
 COPY bin/start /
 COPY bin/cron /
 COPY bin/backup-manager /
+COPY bin/backup-check /
 COPY etc/backup-manager.conf /etc/
 ENTRYPOINT ["/start"]
 CMD ["/cron"]
@@ -62,7 +63,7 @@ ENV BM_CRON="0 3 * * *" \
 
 
 # Tests
-FROM build AS test
+FROM build AS test-base
 RUN set -eux; \
 	test -e /root; test -r /root; \
     chmod a+rX /root -R; \
@@ -71,22 +72,38 @@ RUN set -eux; \
     stat -c "%a" /etc/backup-manager.conf | egrep '^644$'; \
     mkdir -p /var/archives/.temp
 ENV BM_CRON=@reboot \
-    BM_TARBALL_DIRECTORIES="/root" \
     BM_ARCHIVE_PREFIX="ROOT" \
     BM_REPOSITORY_USER="1000" \
     BM_REPOSITORY_GROUP="1000"
 RUN sed 's:^exec \(.*\):timeout 5 \1 || echo OK:' /start -i
+
+FROM test-base AS test-success
+ENV BM_TARBALL_DIRECTORIES="/root"
 RUN ["/start", "/cron"]
-RUN set -eux; \
-    cat /etc/cron.d/backup-manager; \
-    cat /var/log/syslog; \
+RUN set -eux; echo Test successful backup; \
+    tail -n 100 /etc/cron.d/backup-manager /var/log/syslog /var/log/user.log; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
-    ls -lhRn /var/archives; \
+    ls -lhRn /var/archives /var/archives/.temp; \
     ls -lhRn /var/archives | egrep "^-rw-r----- 1 1000 1000 .* ROOT-root\.[0-9]*\.master\.tar\.gz$"; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
-    tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"
+    tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"; \
+    ls -lhRn /tmp; test -f /tmp/unhealthy && exit 1; \
+	touch /tmp/test-success
 
+FROM test-base AS test-fail
+ENV BM_TARBALL_DIRECTORIES="/invalid"
+RUN ["/start", "/cron"]
+RUN set -eux; echo Test unsuccessful backup; \
+    tail -n 100 /var/log/syslog /var/log/user.log; \
+    ls -lhRn /tmp; test -f /tmp/unhealthy || exit 1; \
+    touch /tmp/test-fail
+
+FROM test-base AS test
+COPY --from=test-success /tmp/test-success /tmp/
+COPY --from=test-fail /tmp/test-fail /tmp/
+RUN ls -lhRn /tmp; echo "Tests successful!"
 
 # Release
 FROM build AS release
+HEALTHCHECK --interval=5m CMD test -f /tmp/unhealty && exit 1
 VOLUME /var/archives

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+find "$BM_REPOSITORY_ROOT" -type f -mmin -60 | egrep -q . || exit 1
+find "$BM_TEMP_DIR" -type f -mmin -60 | egrep -q . || exit 0
