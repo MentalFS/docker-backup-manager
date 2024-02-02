@@ -1,4 +1,5 @@
 #!/bin/sh
 
+echo "Starting cron"
 /usr/sbin/cron -f -L 15
 

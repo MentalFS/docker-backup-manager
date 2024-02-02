@@ -1,5 +1,9 @@
 #!/bin/sh
 
 rm -f /tmp/unhealthy
-/usr/sbin/backup-manager --verbose >/proc/1/fd/1 2>/proc/1/fd/2 \
-|| touch /tmp/unhealthy
+
+/usr/sbin/backup-manager --verbose >/proc/1/fd/1 2>/proc/1/fd/2
+
+code=$?
+test $code -ne 0 && touch /tmp/unhealthy
+exit $code
