@@ -1,5 +1,5 @@
 #!/bin/sh
 
-echo "Starting cron"
+date +"Starting cron at %F %T"
 /usr/sbin/cron -f -L 15
 
