@@ -36,7 +36,7 @@ docker run --name backup-manager \
 
 | Environment Variable              | Default               |                                                                                             |
 |-----------------------------------|-----------------------|---------------------------------------------------------------------------------------------|
-| `BM_CRON`                         | `0 3 * * *` *(03:00)* | [Cron expression](https://manpages.debian.org/stable/manpages-de/crontab.5) for backups     |
+| `BM_CRON`                         | `0 3 * * *` *(03:00)* | [Cron expression](https://manpages.debian.org/stable/cron/crontab.5.en.html) for backups    |
 | `BM_REPOSITORY_USER`              | `root`                | The owner of the archive (UID numbers will work), will have read/write access               |
 | `BM_REPOSITORY_GROUP`             | `root`                | The group of the archive (GID numbers will work), will have read access only                |
 | `BM_REPOSITORY_RECURSIVEPURGE`    | `false`               | Do you want to purge directories under `BM_REPOSITORY_ROOT`? (*true*/*false*)               |

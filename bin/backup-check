@@ -1,4 +1,6 @@
 #!/bin/sh
 
-find "$BM_REPOSITORY_ROOT" -type f -mmin -60 | egrep -q . || exit 1
-find "$BM_TEMP_DIR" -type f -mmin -60 | egrep -q . || exit 0
+test "$1"=="--clean" && find /tmp -type f -name unhealthy* -delete && exit
+
+find "${BM_REPOSITORY_ROOT}" -type f -mtime -1 | egrep -vq . && touch /tmp/unhealthy-archives && exit 1
+find "${BM_TEMP_DIR}" -type f | egrep -q . && touch /tmp/unhealthy-temp && exit 1

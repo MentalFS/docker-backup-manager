@@ -87,7 +87,7 @@ RUN set -eux; echo Test successful backup; \
     ls -lhRn /var/archives | egrep "^-rw-r----- 1 1000 1000 .* ROOT-root\.[0-9]*\.master\.tar\.gz$"; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
     tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"; \
-    ls -lhRn /tmp; test -f /tmp/unhealthy && exit 1; \
+    ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" | egrep . && exit 1 || echo OK; \
     date --rfc-3339=seconds | tee /tmp/test-success
 
 FROM test-base AS test-fail
@@ -95,7 +95,7 @@ ENV BM_TARBALL_DIRECTORIES="/invalid"
 RUN ["/start", "/cron"]
 RUN set -eux; echo Test unsuccessful backup; \
     tail -n 100 /var/log/syslog /var/log/user.log; \
-    ls -lhRn /tmp; test -f /tmp/unhealthy || exit 1; \
+    ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" | egrep -v . && exit 1 || echo expected; \
     date --rfc-3339=seconds | tee /tmp/test-fail
 
 # Ensure tests are run before release by copying marker files
@@ -107,5 +107,5 @@ RUN date --rfc-3339=seconds | tee /tmp/tested
 # Release
 FROM build AS release
 COPY --from=test /tmp/tested /tmp/
-HEALTHCHECK --interval=5m CMD ! test -f /tmp/unhealty || exit 1
+HEALTHCHECK --interval=5m CMD find /tmp -type f -name "unhealthy*" | egrep . && exit 1 || exit 0
 VOLUME /var/archives
