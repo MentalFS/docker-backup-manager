@@ -107,5 +107,5 @@ RUN date --rfc-3339=seconds | tee /tmp/tested
 # Release
 FROM build AS release
 COPY --from=test /tmp/tested /tmp/
-HEALTHCHECK --interval=5m CMD find /tmp -type f -name "unhealthy*" | egrep . && exit 1 || exit 0
+HEALTHCHECK --interval=1m CMD find /tmp -type f -name "unhealthy*" | egrep . && exit 1 || exit 0
 VOLUME /var/archives
