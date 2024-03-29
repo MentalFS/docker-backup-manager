@@ -4,15 +4,14 @@ FROM debian:stable-20240311-slim AS build
 RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
     apt update; \
-    apt -y install --no-install-recommends \
-        cron tzdata rsyslog logrotate \
+    apt -y install --no-install-recommends cron \
         bzip2 gettext-base gpg lzma openssh-client rsync xz-utils \
         backup-manager; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
 RUN set -eux; \
-    sed -i '/module(load="imklog")/s/^/#/' /etc/rsyslog.conf; \
-    sed -i '/RSYSLOG_TraditionalFileFormat/s/^/#/' /etc/rsyslog.conf; \
+    test -f /usr/share/perl5/BackupManager/Logger.pm \
+    && sed -i "/^\\s*setlogsock('unix');\\s*$/s/^/#/" /usr/share/perl5/BackupManager/Logger.pm; \
     mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
     chown backup:backup /var/backups; \
     chmod g+rw /var/backups
@@ -81,7 +80,6 @@ FROM test-base AS test-success
 ENV BM_TARBALL_DIRECTORIES="/root"
 RUN ["/start", "/cron"]
 RUN set -eux; echo Test successful backup; \
-    tail -n 100 /etc/cron.d/backup-manager /var/log/syslog /var/log/user.log; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
     ls -lhRn /var/archives /var/archives/.temp; \
     ls -lhRn /var/archives | egrep "^-rw-r----- 1 1000 1000 .* ROOT-root\.[0-9]*\.master\.tar\.gz$"; \
@@ -94,7 +92,6 @@ FROM test-base AS test-fail
 ENV BM_TARBALL_DIRECTORIES="/invalid"
 RUN ["/start", "/cron"]
 RUN set -eux; echo Test unsuccessful backup; \
-    tail -n 100 /var/log/syslog /var/log/user.log; \
     ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" | egrep -v . && exit 1 || echo expected; \
     date --rfc-3339=seconds | tee /tmp/test-fail
 
