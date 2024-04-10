@@ -25,7 +25,6 @@ env:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    if: ${{ github.actor != 'dependabot[bot]' }}
 
     steps:
       - name: Checkout repository
