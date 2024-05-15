@@ -74,11 +74,10 @@ ENV BM_CRON=@reboot \
     BM_ARCHIVE_PREFIX="ROOT" \
     BM_REPOSITORY_USER="1000" \
     BM_REPOSITORY_GROUP="1000"
-RUN sed 's:^exec \(.*\):timeout 5 \1 || echo OK:' /start -i
 
 FROM test-base AS test-success
 ENV BM_TARBALL_DIRECTORIES="/root"
-RUN ["/start", "/cron"]
+RUN ["/start", "/backup-manager"]
 RUN set -eux; echo Test successful backup; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
     ls -lhRn /var/archives /var/archives/.temp; \
@@ -90,7 +89,7 @@ RUN set -eux; echo Test successful backup; \
 
 FROM test-base AS test-fail
 ENV BM_TARBALL_DIRECTORIES="/invalid"
-RUN ["/start", "/cron"]
+RUN ["/start", "/backup-manager"]
 RUN set -eux; echo Test unsuccessful backup; \
     ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" | egrep -v . && exit 1 || echo expected; \
     date --rfc-3339=seconds | tee /tmp/test-fail
