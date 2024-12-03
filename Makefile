@@ -10,6 +10,7 @@ pull:
 
 test:
 	docker build --progress=plain --no-cache-filter=test-base --target=test .
+	@echo OK.
 
 release:
 	docker build --pull -t $(NAME):latest .

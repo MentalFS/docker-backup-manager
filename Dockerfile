@@ -1,3 +1,4 @@
+# check=skip=SecretsUsedInArgOrEnv
 FROM debian:stable-20241202-slim AS build
 
 # Setup
@@ -16,11 +17,8 @@ RUN set -eux; \
     chown backup:backup /var/backups; \
     chmod g+rw /var/backups
 
-COPY bin/start /
-COPY bin/cron /
-COPY bin/backup-manager /
-COPY bin/backup-check /
 COPY etc/backup-manager.conf /etc/
+COPY bin/* /
 ENTRYPOINT ["/start"]
 CMD ["/cron"]
 
@@ -84,14 +82,14 @@ RUN set -eux; echo Test successful backup; \
     ls -lhRn /var/archives | egrep "^-rw-r----- 1 1000 1000 .* ROOT-root\.[0-9]*\.master\.tar\.gz$"; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
     tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"; \
-    ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" | egrep . && exit 1 || echo OK; \
+    ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" -exec false {} + || exit 1 && echo OK; \
     date --rfc-3339=seconds | tee /tmp/test-success
 
 FROM test-base AS test-fail
 ENV BM_TARBALL_DIRECTORIES="/invalid"
 RUN ["/start", "/backup-manager"]
 RUN set -eux; echo Test unsuccessful backup; \
-    ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" | egrep -v . && exit 1 || echo expected; \
+    ls -lhRn /tmp; find /tmp -type f -name "unhealthy*" -exec false {} + && exit 1 || echo No unhealthy marker; \
     date --rfc-3339=seconds | tee /tmp/test-fail
 
 # Ensure tests are run before release by copying marker files
