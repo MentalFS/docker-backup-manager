@@ -1,9 +1,6 @@
 #!/bin/sh
 
 find "${BM_REPOSITORY_ROOT}" -type f -mtime -1 -exec false {} + && echo "No new archives found!" && touch /tmp/unhealthy-archives
-find "${BM_TEMP_DIR}" -type f -exec false {} + || touch /tmp/unhealthy-temp
+find "${BM_TEMP_DIR}" -type f -mtime -1 -exec false {} + || touch /tmp/unhealthy-temp
 
-find "${BM_REPOSITORY_ROOT}"/* -type f -mtime -1 -print0 | xargs -0r du -sch
-
-find "${BM_TEMP_DIR}" -type f -print0 | xargs -0r ls -lh
-find "${BM_TEMP_DIR}" -type f -name "bmu-log.*" -print0 | xargs -0r tail -vn+1
+find "${BM_TEMP_DIR}" -type f -mtime -1 -print0 | xargs -0r egrep -H .

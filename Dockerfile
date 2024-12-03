@@ -6,7 +6,7 @@ RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
     apt update; \
     apt -y install --no-install-recommends cron \
-        bzip2 gettext-base gpg lzma openssh-client rsync xz-utils \
+        ca-certificates bzip2 gettext-base gpg lzma openssh-client rsync xz-utils \
         backup-manager; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
