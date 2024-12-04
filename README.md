@@ -45,7 +45,7 @@ docker run --name backup-manager \
 | `BM_ARCHIVE_PURGEDUPS`            | `true`                | Do you want to replace duplicates by symlinks?                                              |
 | `BM_ARCHIVE_STRICTPURGE`          | `true`                | Purge only archives built with `BM_ARCHIVE_PREFIX`? (*true*/*false*)                        |
 | `BM_ARCHIVE_TTL`                  | `14`                  | Number of days we have to keep an archive (Time To Live)                                    |
-| `BM_ENCRYPTION_METHOD`            | `false`               | Encryption method to use (*gpg* or *false* for no encryption)                               |
+| `BM_ENCRYPTION_METHOD`            | `none`                | Encryption method to use (*gpg* or *none* for no encryption)                                |
 | `BM_ENCRYPTION_RECIPIENT`         | ` `                   | The GPG ID used for encryption of archives                                                  |
 | `BM_TARBALL_BLACKLIST`            | ` `                   | Files to exclude when generating tarballs                                                   |
 | `BM_TARBALL_DIRECTORIES`          | `/VOLUME/*`           | Targets to backup (may contain wildcards, but no spaces)                                    |
@@ -67,7 +67,7 @@ docker run --name backup-manager \
 | `BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT` | ` `                   | Bandwidth limit for rsync uploads (Example: 32M, 1024K, ...)                                |
 | `BM_UPLOAD_RSYNC_BLACKLIST`       | ` `                   | Files to exclude during rsync uploads                                                       |
 | `BM_UPLOAD_RSYNC_DIRECTORIES`     | `/var/archives/`      | Which directories should be backed up with rsync                                            |
-| `GNUPGHOME`                       | `/etc/gnupg`          | GPG configuration folder for encryption (**must be mounted if used**)                       |
+| `GNUPGHOME`                       | `/etc/gnupg`          | GPG configuration folder for encryption                                                     |
 | `TZ`                              | `Europe/Berlin`       | Timezone from [/usr/share/zoneinfo](https://packages.debian.org/stable/all/tzdata/filelist) |
 
 

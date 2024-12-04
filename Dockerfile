@@ -6,7 +6,7 @@ RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
     apt update; \
     apt -y install --no-install-recommends cron \
-        ca-certificates bzip2 gettext-base gpg lzma openssh-client rsync xz-utils \
+        ca-certificates bzip2 gettext-base gnupg lzma openssh-client rsync xz-utils \
         backup-manager; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
@@ -14,8 +14,8 @@ RUN set -eux; \
     test -f /usr/share/perl5/BackupManager/Logger.pm \
     && sed -i "/^\\s*setlogsock('unix');\\s*$/s/^/#/" /usr/share/perl5/BackupManager/Logger.pm; \
     mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
-    chown backup:backup /var/backups; \
-    chmod g+rw /var/backups
+    chown backup:backup /var/backups; chmod g+rw /var/backups; \
+    mkdir -p /etc/gnupg; echo always-trust > /etc/gnupg/gpg.conf; chmod -R go-rwx /etc/gnupg
 
 COPY etc/backup-manager.conf /etc/
 COPY bin/* /
@@ -32,7 +32,7 @@ ENV BM_CRON="0 3 * * *" \
     BM_ARCHIVE_STRICTPURGE="true" \
     BM_ARCHIVE_METHOD="tarball-incremental" \
     BM_ARCHIVE_TTL="14" \
-    BM_ENCRYPTION_METHOD="false" \
+    BM_ENCRYPTION_METHOD="none" \
     BM_ENCRYPTION_RECIPIENT="" \
     BM_TARBALL_NAMEFORMAT="long" \
     BM_TARBALL_FILETYPE="tar.gz" \
@@ -61,6 +61,7 @@ ENV BM_CRON="0 3 * * *" \
 
 # Tests
 FROM build AS test-base
+
 RUN set -eux; \
 	test -e /root; test -r /root; \
     chmod a+rX /root -R; \
