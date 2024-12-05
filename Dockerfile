@@ -5,7 +5,7 @@ FROM debian:stable-20241202-slim AS build
 RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
     apt update; \
-    apt -y install --no-install-recommends cron \
+    apt -y install --no-install-recommends cron anacron \
         ca-certificates bzip2 gettext-base gnupg lzma openssh-client rsync xz-utils \
         backup-manager; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
