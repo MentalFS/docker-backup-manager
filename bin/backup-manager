@@ -1,4 +1,5 @@
 #!/bin/sh
+date +"Starting backup-manager at %F %T"
 
 rm -f /tmp/unhealthy-retval
 

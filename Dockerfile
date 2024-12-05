@@ -55,6 +55,7 @@ ENV BM_CRON="0 3 * * *" \
     BM_UPLOAD_RSYNC_BLACKLIST="" \
     BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT="" \
     GNUPGHOME="/etc/gnupg" \
+    GNUPGIMPORT="/etc/gnupg/import.gpg" \
     LANG=C.UTF-8 \
     TZ=Europe/Berlin
 
