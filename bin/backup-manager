@@ -1,8 +1,8 @@
 #!/bin/sh
 date +"Starting backup-manager at %F %T"
+anacron -s
 
 rm -f /tmp/unhealthy-retval
-
 /usr/sbin/backup-manager --verbose >/proc/1/fd/1 2>/proc/1/fd/2
 
 RETVAL=$?

@@ -4,10 +4,12 @@ FROM debian:stable-20241202-slim AS build
 # Setup
 RUN set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
+    rm -fv /etc/cron*/*; \
     apt update; \
     apt -y install --no-install-recommends cron anacron \
         ca-certificates bzip2 gettext-base gnupg lzma openssh-client rsync xz-utils \
         backup-manager; \
+    rm -fv /etc/cron*/anacron; \
     apt clean; rm -rf /var/lib/apt/lists/* /var/log/*
 
 RUN set -eux; \

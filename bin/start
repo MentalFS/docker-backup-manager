@@ -1,5 +1,6 @@
 #!/bin/sh
 date +"Startup at %F %T"
+anacron -s
 
 find / -type f -path "${GNUPGIMPORT}" -not -path "/proc/*" -not -path "/dev/*" -exec gpg --import {} \;
 
