@@ -20,7 +20,7 @@ RUN set -eux; \
     mkdir -p /etc/gnupg; echo always-trust > /etc/gnupg/gpg.conf; chmod -R go-rwx /etc/gnupg; \
     echo "StrictHostKeyChecking=accept-new" >> /etc/ssh/ssh_config.d/accept-new.conf
 
-COPY etc/backup-manager.conf /etc/
+COPY etc /etc
 COPY bin/* /
 ENTRYPOINT ["/start"]
 CMD ["/cron"]
@@ -57,6 +57,7 @@ ENV BM_CRON="0 3 * * *" \
     BM_UPLOAD_RSYNC_HOSTS="" \
     BM_UPLOAD_RSYNC_BLACKLIST="" \
     BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT="" \
+    BM_UPLOAD_RSYNC_EXTRA_OPTIONS="--delete" \
     GNUPGHOME="/etc/gnupg" \
     GNUPGIMPORT="/etc/gnupg/import.gpg" \
     LANG=C.UTF-8 \
@@ -69,7 +70,7 @@ FROM build AS test-base
 RUN set -eux; \
 	test -e /root; test -r /root; \
     chmod a+rX /root -R; \
-    ls -lha /root; \
+    ls -lha /root /etc/cron* /etc/backup*; \
     stat -c "%n %U %G %a" /etc/backup-manager.conf; \
     stat -c "%a" /etc/backup-manager.conf | egrep '^644$'; \
     mkdir -p /var/archives/.temp
@@ -106,5 +107,5 @@ RUN date --rfc-3339=seconds | tee /tmp/tested
 # Release
 FROM build AS release
 COPY --from=test /tmp/tested /tmp/
-HEALTHCHECK --interval=1m CMD find /tmp -type f -name "unhealthy*" | egrep . && exit 1 || exit 0
+HEALTHCHECK --interval=1m CMD find /tmp -type f -name "unhealthy*" -exec false {} + || exit 1
 VOLUME /var/archives

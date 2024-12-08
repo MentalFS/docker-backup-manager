@@ -1,11 +1,10 @@
 #!/bin/sh
 date +"Startup at %F %T"
-anacron -s
 
 find / -type f -path "${GNUPGIMPORT}" -not -path "/proc/*" -not -path "/dev/*" -exec gpg --import {} \;
 
 mkdir -p /etc/cron.d
-echo "${BM_CRON} root /backup-manager" > /etc/cron.d/backup-manager
+echo "${BM_CRON} root anacron -s" > /etc/cron.d/anacron
 env > /etc/environment
 
 exec "$@"
