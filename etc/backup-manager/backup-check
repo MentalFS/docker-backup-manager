@@ -4,4 +4,3 @@ find "${BM_REPOSITORY_ROOT}" -type f -mtime -1 -exec false {} + && echo "No new 
 find "${BM_TEMP_DIR}" -type f -mmin -60 -exec false {} + || touch /tmp/unhealthy-temp
 
 find "${BM_TEMP_DIR}" -type f -mmin -60 -print0 | xargs -0r egrep -H .
-find /tmp -type f -name "unhealthy*" -exec false {} + || rm -f /var/spool/anacron/cron.daily

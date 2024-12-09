@@ -6,4 +6,5 @@ rm -f /tmp/unhealthy-retval
 
 RETVAL=$?
 test $RETVAL -ne 0 && touch /tmp/unhealthy-retval
+find /tmp -type f -name "unhealthy*" -exec false {} + || rm -f /var/spool/anacron/cron.daily
 exit $RETVAL
