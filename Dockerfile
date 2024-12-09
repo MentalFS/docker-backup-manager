@@ -16,6 +16,7 @@ RUN set -eux; \
     test -f /usr/share/perl5/BackupManager/Logger.pm \
     && sed -i "/^\\s*setlogsock('unix');\\s*$/s/^/#/" /usr/share/perl5/BackupManager/Logger.pm; \
     mv /etc/backup-manager.conf /etc/backup-manager.conf.orig; \
+    mv /etc/anacrontab /etc/anacrontab.orig; \
     chown backup:backup /var/backups; chmod g+rw /var/backups; \
     mkdir -p /etc/gnupg; echo always-trust > /etc/gnupg/gpg.conf; chmod -R go-rwx /etc/gnupg; \
     echo "StrictHostKeyChecking=accept-new" >> /etc/ssh/ssh_config.d/accept-new.conf

@@ -4,8 +4,7 @@ date +"Startup at %F %T"
 for GNUPGFILE in "${GNUPGIMPORT}"; do test -f "${GNUPGFILE}" && gpg --import "${GNUPGFILE}"; done
 
 mkdir -p /etc/cron.d
-echo "${BM_CRON} root /usr/sbin/anacron -sd" > /etc/cron.d/anacron
-sed 's:^\(\S*\s*\)[0-9]*:\10:' -i /etc/anacrontab
+echo "${BM_CRON} root /usr/sbin/anacron -sd >/proc/1/fd/1 2>/proc/1/fd/2" > /etc/cron.d/anacron
 env > /etc/environment
 
 exec "$@"
