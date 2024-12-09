@@ -81,7 +81,7 @@ ENV BM_CRON=@reboot \
 
 FROM test-base AS test-success
 ENV BM_TARBALL_DIRECTORIES="/root"
-RUN ["/start", "/backup-manager"]
+RUN ["/start", "anacron", "-sd"]
 RUN set -eux; echo Test successful backup; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
     ls -lhRn /var/archives /var/archives/.temp; \
@@ -107,5 +107,6 @@ RUN date --rfc-3339=seconds | tee /tmp/tested
 # Release
 FROM build AS release
 COPY --from=test /tmp/tested /tmp/
+RUN rm /tmp/tested
 HEALTHCHECK --interval=1m CMD find /tmp -type f -name "unhealthy*" -exec false {} + || exit 1
 VOLUME /var/archives
