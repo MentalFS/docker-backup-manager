@@ -2,6 +2,6 @@
 
 find /tmp -type f -name "unhealthy*" -delete
 find "${BM_REPOSITORY_ROOT}" -type f -mtime -1 -exec false {} + && echo "No new archives found!" && touch /tmp/unhealthy-archives
-find "${BM_TEMP_DIR}" -type f -mmin -60 -exec false {} + || touch /tmp/unhealthy-temp
+find "${BM_TEMP_DIR}" -type f -exec false {} + || touch /tmp/unhealthy-temp
 
-find "${BM_TEMP_DIR}" -type f -mmin -60 -print0 | xargs -0r egrep -H .
+find "${BM_TEMP_DIR}" -type f -print0 | xargs -0r egrep -H .
