@@ -1,10 +1,10 @@
 #!/bin/sh
 date +"Starting backup-manager at %F %T"
 
-rm -f /tmp/unhealthy-retval
 /usr/sbin/backup-manager --verbose
-
 RETVAL=$?
+
+rm -f /tmp/unhealthy-retval
 test $RETVAL -ne 0 && touch /tmp/unhealthy-retval
 find /tmp -type f -name "unhealthy*" -exec false {} + || rm -f /var/spool/anacron/cron.daily
 exit $RETVAL
