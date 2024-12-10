@@ -2,7 +2,6 @@
 date +"Startup at %F %T"
 
 for GNUPGFILE in "${GNUPGIMPORT}"; do test -f "${GNUPGFILE}" && gpg --import "${GNUPGFILE}"; done
-/backup-check
 
 mkdir -p /etc/cron.d
 echo "${BM_CRON} root /usr/sbin/anacron -sd" > /etc/cron.d/anacron
