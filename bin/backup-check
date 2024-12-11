@@ -12,4 +12,4 @@ find "${BM_TEMP_DIR}" -type f -exec false {} + || touch /tmp/unhealthy-temp
 find /tmp -type f -name "unhealthy*" -exec false {} + || rm -f /var/spool/anacron/backup-manager
 
 # print error logs if present
-find "${BM_TEMP_DIR}" -maxdeppth 1 -type f -print0 | xargs -0r egrep -H .
+find "${BM_TEMP_DIR}" -maxdepth 1 -type f -print0 | xargs -0r egrep -H .
