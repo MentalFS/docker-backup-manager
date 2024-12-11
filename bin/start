@@ -1,10 +1,13 @@
 #!/bin/sh
 date +"Startup at %F %T"
 
+# gnupg import
 for GNUPGFILE in "${GNUPGIMPORT}"; do test -f "${GNUPGFILE}" && gpg --import "${GNUPGFILE}"; done
 
+# anacron setup
 mkdir -p /etc/cron.d
 echo "${BM_CRON} root /usr/sbin/anacron -sd" > /etc/cron.d/anacron
 env > /etc/environment
 
+# hand over main process
 exec "$@"
