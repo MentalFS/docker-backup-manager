@@ -4,9 +4,12 @@ date +"Startup at %F %T"
 # gnupg import
 for GNUPGFILE in "${GNUPGIMPORT}"; do test -f "${GNUPGFILE}" && gpg --import "${GNUPGFILE}"; done
 
+# compability with old configurations
+test -n "${BM_CRON}" && export CRON_SCHEDULE="${BM_CRON}"
+
 # anacron setup
 mkdir -p /etc/cron.d
-echo "${BM_CRON} root /usr/sbin/anacron -sd" > /etc/cron.d/anacron
+echo "${CRON_SCHEDULE} root /usr/sbin/anacron -sd" > /etc/cron.d/anacron
 env > /etc/environment
 
 # hand over main process

@@ -27,7 +27,7 @@ ENTRYPOINT ["/start"]
 CMD ["/cron"]
 
 # Configuration
-ENV BM_CRON="0 3 * * *" \
+ENV CRON_SCHEDULE="@hourly" \
     BM_REPOSITORY_USER="root" \
     BM_REPOSITORY_GROUP="root" \
     BM_REPOSITORY_RECURSIVEPURGE="false" \
@@ -75,7 +75,7 @@ RUN set -eux; \
     stat -c "%n %U %G %a" /etc/backup-manager.conf; \
     stat -c "%a" /etc/backup-manager.conf | egrep '^644$'; \
     mkdir -p /var/archives/.temp
-ENV BM_CRON=@reboot \
+ENV CRON_SCHEDULE=@reboot \
     BM_ARCHIVE_PREFIX="ROOT" \
     BM_REPOSITORY_USER="1000" \
     BM_REPOSITORY_GROUP="1000"
