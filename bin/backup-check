@@ -9,7 +9,7 @@ find "${BM_REPOSITORY_ROOT}" -type f -mtime -1 -exec false {} + && echo "No new 
 find "${BM_TEMP_DIR}" -type f -exec false {} + || touch /tmp/unhealthy-temp
 
 # make anacron try again
-find /tmp -type f -name "unhealthy*" -exec false {} + || rm -f /var/spool/anacron/backup-manager
+find /tmp -type f -name "unhealthy*" -exec false {} + || rm -f /var/archives/.anacron/backup-manager
 
 # print error logs if present
 find "${BM_TEMP_DIR}" -maxdepth 1 -type f -print0 | xargs -0r egrep -H .

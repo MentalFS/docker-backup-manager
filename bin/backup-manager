@@ -3,11 +3,11 @@ date +"Starting backup-manager at %F %T"
 rm -f /tmp/unhealthy-return
 
 # prevent anacron from running process twice
-anacron -u backup-manager
+anacron -S /var/archives/.anacron -u backup-manager
 
 # hand over process to backup-manager
 exec /usr/sbin/backup-manager --verbose
 
 # only reached on error
 touch /tmp/unhealthy-return
-rm -f /var/spool/anacron/backup-manager
+rm -f /var/archives/.anacron/backup-manager

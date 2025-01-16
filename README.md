@@ -8,9 +8,9 @@ The Volumes can be mounted under `/VOLUME/<Volume Name>`, or at a place configur
 
 ## Volumes
 
-| Path            |                                                                |
-|-----------------|-----------------------------------------------------------------
-| `/var/archives` | Target for the backup archives. Will contain a *.temp* folder. |
+| Path            |                                                                               |
+|-----------------|--------------------------------------------------------------------------------
+| `/var/archives` | Target for the backup archives. Will contain a *.temp* and *.anacron* folder. |
 
 
 ## Download

@@ -82,10 +82,10 @@ ENV CRON_SCHEDULE=@reboot \
 
 FROM test-base AS test-success
 ENV BM_TARBALL_DIRECTORIES="/root"
-RUN ["/start", "anacron", "-sd"]
+RUN ["/start", "anacron", "-dsS", "/var/archives/.anacron"]
 RUN set -eux; echo Test successful backup; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
-    ls -lhRn /var/archives /var/archives/.temp; \
+    ls -lhRn /var/archives /var/archives/.temp /var/archives/.anacron; \
     ls -lhRn /var/archives | egrep "^-rw-r----- 1 1000 1000 .* ROOT-root\.[0-9]*\.master\.tar\.gz$"; \
     test -f /var/archives/ROOT-root.*.master.tar.gz; \
     tar tvzf /var/archives/ROOT-root.*.master.tar.gz | egrep ".* 0/0 .*"; \
