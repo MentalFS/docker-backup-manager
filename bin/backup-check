@@ -5,7 +5,7 @@ gpgconf --kill gpg-agent
 find /tmp -maxdepth 1 -type f -name "unhealthy*" -delete
 
 # check for new archives or failure logs
-find "${BM_REPOSITORY_ROOT}" -type f -mtime -1 -exec false {} + && echo "No new archives found!" && touch /tmp/unhealthy-archives
+find "${BM_REPOSITORY_ROOT}" -type f -maxdepth 1 -mtime -1 -exec false {} + && echo "No new archives found!" && touch /tmp/unhealthy-archives
 find "${BM_TEMP_DIR}" -type f -exec false {} + || touch /tmp/unhealthy-temp
 
 # make anacron try again
