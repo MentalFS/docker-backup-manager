@@ -75,12 +75,12 @@ docker run --name backup-manager \
 
 ## Notes
 
-* Backus will be retried according to `CRON_SCHEDULE` when a step fails (including uploads).
+* Backups will be retried according to `CRON_SCHEDULE` when a step fails (including uploads).
 * GPG encryption will only work with *tar*, *tar.gz*, *tar.bz2* formats.
+* `BM_UPLOAD_METHOD` *ssh-gpg* does not support `BM_UPLOAD_SSH_PURGE` and `BM_UPLOAD_SSH_TTL`.
 * You can specify multiple hosts for uploads, but all will use the same authentication, port and destination folder.
 * SSH passwords or keys with password are not supported.
 * rsync shares multiple settings with SSH, including the authentication.
-* FTP uploads have unresolved critical bugs for over 5 years and thus are not supported in this image.
 * The [upstream project] seems to be stale, so this image uses the Debian package which has a few patches.
 
 [Backup-Manager]: https://packages.debian.org/stable/backup-manager
