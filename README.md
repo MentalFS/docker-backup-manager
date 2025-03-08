@@ -68,7 +68,6 @@ docker run --name backup-manager \
 | `BM_UPLOAD_RSYNC_BLACKLIST`       | ` `                     | Files to exclude during rsync uploads                                         |
 | `BM_UPLOAD_RSYNC_DIRECTORIES`     | `/var/archives/`        | Which directories should be backed up with rsync                              |
 | `BM_UPLOAD_RSYNC_EXTRA_OPTIONS`   | `--delete`              | Extra options for rsync                                                       |
-| `GNUPGHOME`                       | `/etc/gnupg`            | GPG configuration folder for encryption                                       |
 | `GNUPGIMPORT`                     | `/etc/gnupg/import.gpg` | GPG keys(s) to import on startup (if they exist)                              |
 | `TZ`                              | `Europe/Berlin`         | Timezone from [/usr/share/zoneinfo]                                           |
 

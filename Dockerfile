@@ -59,7 +59,6 @@ ENV CRON_SCHEDULE="@hourly" \
     BM_UPLOAD_RSYNC_BLACKLIST="" \
     BM_UPLOAD_RSYNC_BANDWIDTH_LIMIT="" \
     BM_UPLOAD_RSYNC_EXTRA_OPTIONS="--delete" \
-    GNUPGHOME="/etc/gnupg" \
     GNUPGIMPORT="/etc/gnupg/import.gpg" \
     LANG=C.UTF-8 \
     TZ=Europe/Berlin
