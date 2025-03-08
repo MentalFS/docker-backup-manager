@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # cleanup old temp files
-find "${BM_TEMP_DIR}" -mindepth 1 -delete -print | sed 's:^:deleting :'
+find "${BM_TEMP_DIR}" -mindepth 1 -mtime -1 -delete -print | sed 's:^:deleting :'
