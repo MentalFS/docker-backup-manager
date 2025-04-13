@@ -9,7 +9,7 @@ test -n "${BM_CRON}" && export CRON_SCHEDULE="${BM_CRON}"
 
 # anacron setup
 mkdir -p /etc/cron.d /var/archives/.anacron
-echo "${CRON_SCHEDULE} root /usr/sbin/anacron -dsS /var/archives/.anacron" > /etc/cron.d/anacron
+echo "${CRON_SCHEDULE} root /anacron" > /etc/cron.d/anacron
 env > /etc/environment
 
 # hand over main process

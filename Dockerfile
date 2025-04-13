@@ -81,7 +81,7 @@ ENV CRON_SCHEDULE=@reboot \
 
 FROM test-base AS test-success
 ENV BM_TARBALL_DIRECTORIES="/root"
-RUN ["/start", "anacron", "-dsS", "/var/archives/.anacron"]
+RUN ["/start", "/anacron"]
 RUN set -eux; echo Test successful backup; \
     find /var/archives/.temp/ -type f -exec cat {} + ; \
     ls -lhRn /var/archives /var/archives/.temp /var/archives/.anacron; \

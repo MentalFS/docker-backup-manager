@@ -1,0 +1,4 @@
+#!/bin/sh
+date +"Starting anacron at %F %T"
+
+exec /usr/sbin/anacron -dsS /var/archives/.anacron
