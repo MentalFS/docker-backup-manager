@@ -3,6 +3,7 @@ date +"Startup at %F %T"
 
 # gnupg import
 for GNUPGFILE in "${GNUPGIMPORT}"; do test -f "${GNUPGFILE}" && gpg --import "${GNUPGFILE}"; done
+gpgconf --kill gpg-agent
 
 # compability with old configurations
 test -n "${BM_CRON}" && export CRON_SCHEDULE="${BM_CRON}"
