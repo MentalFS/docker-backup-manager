@@ -1,5 +1,5 @@
 # check=skip=SecretsUsedInArgOrEnv
-FROM debian:stable-20261104-slim AS build
+FROM debian:stable-20261123-slim AS build
 
 # Setup
 RUN set -eux; \
